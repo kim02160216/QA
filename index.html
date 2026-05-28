@@ -194,6 +194,82 @@
   }
   .toolbar-right { display: flex; gap: 8px; }
 
+  /* View toggle */
+  .view-toggle {
+    display: inline-flex;
+    background: var(--bg-elev-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .view-toggle-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.12s;
+  }
+  .view-toggle-btn:hover { color: var(--text-primary); }
+  .view-toggle-btn.active {
+    background: var(--bg-elev-3);
+    color: var(--text-primary);
+  }
+
+  /* Category group */
+  .category-group { margin-bottom: 24px; }
+  .category-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .category-group-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .category-group-name::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .category-group-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-elev-2);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .category-group-bar {
+    flex: 1;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .mini-stat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
   .filters {
     display: flex;
     gap: 8px;
@@ -598,6 +674,10 @@
         <span class="toolbar-meta mono" id="currentMeta">0 issues</span>
       </div>
       <div class="toolbar-right">
+        <div class="view-toggle">
+          <button class="view-toggle-btn active" id="viewListBtn" onclick="setView('list')">☰ 목록</button>
+          <button class="view-toggle-btn" id="viewGroupBtn" onclick="setView('group')">⊞ 태그별</button>
+        </div>
         <button class="btn btn-sm" onclick="exportData()">⬇ 내보내기</button>
       </div>
     </div>
@@ -616,6 +696,8 @@
       <span class="filter-chip" data-filter="priority" data-value="high"><span class="dot" style="background:var(--high)"></span>High</span>
       <span class="filter-chip" data-filter="priority" data-value="medium"><span class="dot" style="background:var(--medium)"></span>Medium</span>
     </div>
+
+    <div class="filters" id="categoryFilters"></div>
 
     <div class="issue-list" id="issueList">
       <div class="loading">로딩 중...</div>
@@ -764,6 +846,8 @@ const state = {
   currentWorkId: null,
   filterStatus: 'all',
   filterPriority: 'all',
+  filterCategory: 'all',
+  view: 'list',
   editingIssueId: null,
   currentIssueId: null
 };
@@ -842,11 +926,45 @@ function selectWork(id) {
 
 function setFilter(type, value) {
   if (type === 'status') state.filterStatus = value;
-  else state.filterPriority = value;
+  else if (type === 'priority') state.filterPriority = value;
+  else if (type === 'category') state.filterCategory = value;
   $$('.filter-chip[data-filter="'+type+'"]').forEach(c => {
     c.classList.toggle('active', c.dataset.value === value);
   });
   render();
+}
+
+function setView(view) {
+  state.view = view;
+  $('#viewListBtn').classList.toggle('active', view === 'list');
+  $('#viewGroupBtn').classList.toggle('active', view === 'group');
+  render();
+}
+
+// 현재 작품 범위 내 카테고리 필터 칩 렌더링
+function renderCategoryFilters() {
+  const scoped = state.currentWorkId === null
+    ? state.issues
+    : state.issues.filter(i => i.work_id === state.currentWorkId);
+  const cats = [...new Set(scoped.map(i => i.category).filter(Boolean))].sort();
+  const container = $('#categoryFilters');
+  if (cats.length === 0) { container.innerHTML = ''; return; }
+
+  // 현재 선택된 카테고리가 범위 밖이면 리셋
+  if (state.filterCategory !== 'all' && !cats.includes(state.filterCategory)) {
+    state.filterCategory = 'all';
+  }
+
+  let html = `<span class="filter-chip ${state.filterCategory==='all'?'active':''}" data-filter="category" data-value="all">전체 카테고리</span>`;
+  cats.forEach(cat => {
+    const cnt = scoped.filter(i => i.category === cat).length;
+    html += `<span class="filter-chip ${state.filterCategory===cat?'active':''}" data-filter="category" data-value="${escapeHtml(cat)}">${escapeHtml(cat)} <span style="opacity:0.6; font-family:'JetBrains Mono',monospace; font-size:11px;">${cnt}</span></span>`;
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => setFilter('category', chip.dataset.value));
+  });
 }
 
 function getFilteredIssues() {
@@ -854,11 +972,37 @@ function getFilteredIssues() {
     if (state.currentWorkId !== null && i.work_id !== state.currentWorkId) return false;
     if (state.filterStatus !== 'all' && i.status !== state.filterStatus) return false;
     if (state.filterPriority !== 'all' && i.priority !== state.filterPriority) return false;
+    if (state.filterCategory !== 'all' && i.category !== state.filterCategory) return false;
     return true;
   });
 }
 
+function issueCardHtml(i) {
+  const work = state.works.find(w => w.id === i.work_id);
+  return `<div class="issue-card priority-${i.priority}" onclick="openDetail(${i.id})">
+    <div class="issue-head">
+      <div class="issue-title-block">
+        <div class="issue-title">${escapeHtml(i.title)}</div>
+        <div class="issue-meta">
+          <span class="id mono">#${String(i.id).padStart(3,'0')}</span>
+          <span>${work ? escapeHtml(work.name) : '-'}</span>
+          ${i.reporter ? `<span>• 제보 ${escapeHtml(i.reporter)}</span>` : ''}
+          ${i.assignee ? `<span>• 담당 ${escapeHtml(i.assignee)}</span>` : ''}
+          <span>• ${formatTime(i.updated_at)}</span>
+        </div>
+      </div>
+      <div class="issue-tags">
+        <span class="tag tag-${i.priority}">${PRIORITY_LABELS[i.priority]}</span>
+        <span class="tag tag-${i.status}">${STATUS_LABELS[i.status]}</span>
+        ${i.category ? `<span class="tag tag-category">${escapeHtml(i.category)}</span>` : ''}
+      </div>
+    </div>
+    ${i.description ? `<div class="issue-desc">${escapeHtml(i.description)}</div>` : ''}
+  </div>`;
+}
+
 function render() {
+  renderCategoryFilters();
   const issues = getFilteredIssues();
   const work = state.works.find(w => w.id === state.currentWorkId);
   $('#currentWorkTitle').textContent = work ? work.name : '전체 이슈';
@@ -881,36 +1025,53 @@ function render() {
     <div class="stat-card"><div class="stat-label" style="color:var(--success)">완료</div><div class="stat-value" style="color:var(--success)">${counts.resolved}</div></div>
   `;
 
-  // Issue list
   if (issues.length === 0) {
     $('#issueList').innerHTML = `<div class="empty"><div class="empty-icon">∅</div><div class="empty-text">해당 조건의 이슈가 없습니다</div></div>`;
     return;
   }
-  // Sort: priority then created_at
-  const order = { critical: 0, high: 1, medium: 2, low: 3 };
-  issues.sort((a,b) => (order[a.priority]||9) - (order[b.priority]||9) || new Date(b.created_at) - new Date(a.created_at));
 
-  $('#issueList').innerHTML = issues.map(i => {
-    const work = state.works.find(w => w.id === i.work_id);
-    return `<div class="issue-card priority-${i.priority}" onclick="openDetail(${i.id})">
-      <div class="issue-head">
-        <div class="issue-title-block">
-          <div class="issue-title">${escapeHtml(i.title)}</div>
-          <div class="issue-meta">
-            <span class="id mono">#${String(i.id).padStart(3,'0')}</span>
-            <span>${work ? escapeHtml(work.name) : '-'}</span>
-            ${i.reporter ? `<span>• 제보 ${escapeHtml(i.reporter)}</span>` : ''}
-            ${i.assignee ? `<span>• 담당 ${escapeHtml(i.assignee)}</span>` : ''}
-            <span>• ${formatTime(i.updated_at)}</span>
-          </div>
-        </div>
-        <div class="issue-tags">
-          <span class="tag tag-${i.priority}">${PRIORITY_LABELS[i.priority]}</span>
-          <span class="tag tag-${i.status}">${STATUS_LABELS[i.status]}</span>
-          ${i.category ? `<span class="tag tag-category">${escapeHtml(i.category)}</span>` : ''}
-        </div>
+  const order = { critical: 0, high: 1, medium: 2, low: 3 };
+  const sortFn = (a,b) => (order[a.priority]||9) - (order[b.priority]||9) || new Date(b.created_at) - new Date(a.created_at);
+
+  if (state.view === 'group') {
+    renderGroupView(issues, sortFn);
+  } else {
+    const sorted = [...issues].sort(sortFn);
+    $('#issueList').innerHTML = sorted.map(issueCardHtml).join('');
+  }
+}
+
+// 카테고리(태그)별로 묶어서 출력
+function renderGroupView(issues, sortFn) {
+  const groups = {};
+  issues.forEach(i => {
+    const key = i.category || '(미분류)';
+    (groups[key] = groups[key] || []).push(i);
+  });
+  const order = { critical: 0, high: 1, medium: 2, low: 3 };
+  // 그룹 정렬: 그룹 내 최고 우선순위 → 이슈 수 순
+  const groupKeys = Object.keys(groups).sort((a,b) => {
+    const minA = Math.min(...groups[a].map(i => order[i.priority] ?? 9));
+    const minB = Math.min(...groups[b].map(i => order[i.priority] ?? 9));
+    return minA - minB || groups[b].length - groups[a].length;
+  });
+
+  $('#issueList').innerHTML = groupKeys.map(key => {
+    const items = groups[key].sort(sortFn);
+    const openCnt = items.filter(i => !['resolved','closed'].includes(i.status)).length;
+    const critCnt = items.filter(i => i.priority === 'critical' && !['resolved','closed'].includes(i.status)).length;
+    const doneCnt = items.filter(i => ['resolved','closed'].includes(i.status)).length;
+    let bar = '';
+    if (critCnt) bar += `<span class="mini-stat tag-critical">CRIT ${critCnt}</span>`;
+    if (openCnt) bar += `<span class="mini-stat tag-open">미해결 ${openCnt}</span>`;
+    if (doneCnt) bar += `<span class="mini-stat tag-resolved">완료 ${doneCnt}</span>`;
+    return `<div class="category-group">
+      <div class="category-group-header">
+        <span class="category-group-name">${escapeHtml(key)}</span>
+        <span class="category-group-count mono">${items.length}건</span>
+        <span class="category-group-bar">${bar}</span>
       </div>
-      ${i.description ? `<div class="issue-desc">${escapeHtml(i.description)}</div>` : ''}
+      <div class="issue-list">${items.map(issueCardHtml).join('')}</div>
     </div>`;
   }).join('');
 }
@@ -1115,9 +1276,13 @@ function exportData() {
   lines.push(`생성일시: ${new Date().toLocaleString('ko-KR')}`);
   lines.push(`이슈 수: ${issues.length}건`);
   lines.push('');
-  issues.forEach(i => {
+
+  const order = { critical: 0, high: 1, medium: 2, low: 3 };
+  const sortFn = (a,b) => (order[a.priority]||9) - (order[b.priority]||9) || new Date(b.created_at) - new Date(a.created_at);
+
+  const writeIssue = (i) => {
     const w = state.works.find(x => x.id === i.work_id);
-    lines.push(`## #${String(i.id).padStart(3,'0')} [${PRIORITY_LABELS[i.priority]}] ${i.title}`);
+    lines.push(`### #${String(i.id).padStart(3,'0')} [${PRIORITY_LABELS[i.priority]}] ${i.title}`);
     lines.push(`- 작품: ${w?.name || '-'}`);
     lines.push(`- 상태: ${STATUS_LABELS[i.status]}`);
     lines.push(`- 카테고리: ${i.category || '-'}`);
@@ -1127,7 +1292,25 @@ function exportData() {
       lines.push(i.description.split('\n').map(l => '  ' + l).join('\n'));
     }
     lines.push('');
-  });
+  };
+
+  if (state.view === 'group') {
+    // 카테고리(태그)별로 묶어서 출력
+    const groups = {};
+    issues.forEach(i => {
+      const key = i.category || '(미분류)';
+      (groups[key] = groups[key] || []).push(i);
+    });
+    Object.keys(groups).sort().forEach(key => {
+      const items = groups[key].sort(sortFn);
+      lines.push(`## 📌 ${key} (${items.length}건)`);
+      lines.push('');
+      items.forEach(writeIssue);
+    });
+  } else {
+    issues.sort(sortFn).forEach(writeIssue);
+  }
+
   const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
