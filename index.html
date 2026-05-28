@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovelChat QA 관리</title>
+<title>Chatple QA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -779,7 +779,7 @@
   <div class="header-inner">
     <div class="logo">
       <div class="logo-mark">QA</div>
-      <div class="logo-text">NovelChat QA <span>/ 작품별 이슈 관리</span></div>
+      <div class="logo-text">Chatple QA</div>
     </div>
     <div class="header-actions">
       <span class="share-info" id="shareInfo">공유 가능 · 실시간 동기화</span>
@@ -1599,7 +1599,7 @@ function exportData() {
   const issues = getFilteredIssues();
   const work = state.works.find(w => w.id === state.currentWorkId);
   const lines = [];
-  lines.push(`# NovelChat QA 리포트 - ${work ? work.name : '전체'}`);
+  lines.push(`# Chatple QA 리포트 - ${work ? work.name : '전체'}`);
   lines.push(`생성일시: ${new Date().toLocaleString('ko-KR')}`);
   lines.push(`이슈 수: ${issues.length}건`);
   lines.push('');
