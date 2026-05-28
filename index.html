@@ -389,7 +389,42 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .issue-tags { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+  .issue-tags { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .issue-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+
+  /* 첨부 배지 */
+  .tag-attach {
+    background: var(--accent-soft);
+    color: var(--accent);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* 카드 썸네일 미리보기 */
+  .card-thumb {
+    position: relative;
+    width: 56px; height: 56px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elev-2);
+    cursor: zoom-in;
+    transition: transform 0.12s, border-color 0.12s;
+  }
+  .card-thumb:hover { transform: scale(1.05); border-color: var(--accent); }
+  .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card-thumb-more {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* 첨부 있는 카드: 썸네일로 충분히 구분되므로 별도 마커 없음 */
 
   .tag {
     font-family: 'JetBrains Mono', monospace;
@@ -519,6 +554,104 @@
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 32px;
+  }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 1.5px dashed var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg-elev-2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .upload-zone-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .upload-icon { font-size: 22px; }
+  .upload-text { font-size: 13px; color: var(--text-secondary); }
+  .upload-hint { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* Thumbnail grid */
+  .thumb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .thumb-grid:empty { margin-top: 0; }
+  .thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg-elev-2);
+    cursor: pointer;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-remove {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .thumb:hover .thumb-remove { opacity: 1; }
+  .thumb-uploading {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    cursor: zoom-out;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 24px; right: 24px;
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: var(--bg-elev-3);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 18px;
   }
 
   /* Issue detail */
@@ -695,6 +828,8 @@
       <span class="filter-chip" data-filter="priority" data-value="critical"><span class="dot" style="background:var(--critical)"></span>Critical</span>
       <span class="filter-chip" data-filter="priority" data-value="high"><span class="dot" style="background:var(--high)"></span>High</span>
       <span class="filter-chip" data-filter="priority" data-value="medium"><span class="dot" style="background:var(--medium)"></span>Medium</span>
+      <span style="width:1px; background:var(--border); margin:0 4px;"></span>
+      <span class="filter-chip" data-filter="attach" data-value="yes">📎 첨부 있음</span>
     </div>
 
     <div class="filters" id="categoryFilters"></div>
@@ -772,6 +907,18 @@
         <label class="form-label">상세 설명</label>
         <textarea class="form-textarea" id="issueDesc" placeholder="이슈에 대한 상세 내용, 재현 방법, 영향 범위 등"></textarea>
       </div>
+      <div class="form-row">
+        <label class="form-label">이미지 첨부</label>
+        <div class="upload-zone" id="issueUploadZone" onclick="document.getElementById('issueFileInput').click()">
+          <input type="file" id="issueFileInput" accept="image/*" multiple style="display:none" onchange="handleStagedFiles(event)">
+          <div class="upload-zone-inner">
+            <span class="upload-icon">🖼️</span>
+            <span class="upload-text">클릭하거나 이미지를 드래그하세요 · 붙여넣기(Ctrl+V)도 가능</span>
+            <span class="upload-hint">PNG · JPG · GIF · WEBP / 최대 10MB</span>
+          </div>
+        </div>
+        <div class="thumb-grid" id="stagedThumbs"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('issueModal')">취소</button>
@@ -821,6 +968,12 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://yhekwrbeababhublhfap.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_hJc6kW_x-T7cILZpfd6vvA_i0nYKsg5';
@@ -847,9 +1000,11 @@ const state = {
   filterStatus: 'all',
   filterPriority: 'all',
   filterCategory: 'all',
+  filterAttach: false,
   view: 'list',
   editingIssueId: null,
-  currentIssueId: null
+  currentIssueId: null,
+  stagedFiles: []
 };
 
 function $(sel) { return document.querySelector(sel); }
@@ -886,6 +1041,20 @@ async function loadIssues() {
   const { data, error } = await sb.from('qa_issues').select('*').order('created_at', { ascending: false });
   if (error) { showToast('이슈 로드 실패: '+error.message, 'error'); return; }
   state.issues = data || [];
+  // 첨부 개수 + 대표 썸네일 집계
+  try {
+    const { data: atts } = await sb.from('qa_attachments')
+      .select('issue_id, public_url').order('created_at', { ascending: true });
+    const counts = {}, thumbs = {};
+    (atts || []).forEach(a => {
+      counts[a.issue_id] = (counts[a.issue_id]||0) + 1;
+      if (!thumbs[a.issue_id]) thumbs[a.issue_id] = a.public_url; // 가장 먼저 올린 이미지를 대표로
+    });
+    state.issues.forEach(i => {
+      i._attachCount = counts[i.id] || 0;
+      i._thumb = thumbs[i.id] || null;
+    });
+  } catch(e) { /* 첨부 집계 실패해도 무시 */ }
   renderWorks();
   render();
 }
@@ -928,6 +1097,12 @@ function setFilter(type, value) {
   if (type === 'status') state.filterStatus = value;
   else if (type === 'priority') state.filterPriority = value;
   else if (type === 'category') state.filterCategory = value;
+  else if (type === 'attach') {
+    state.filterAttach = !state.filterAttach; // 토글
+    $$('.filter-chip[data-filter="attach"]').forEach(c => c.classList.toggle('active', state.filterAttach));
+    render();
+    return;
+  }
   $$('.filter-chip[data-filter="'+type+'"]').forEach(c => {
     c.classList.toggle('active', c.dataset.value === value);
   });
@@ -973,13 +1148,14 @@ function getFilteredIssues() {
     if (state.filterStatus !== 'all' && i.status !== state.filterStatus) return false;
     if (state.filterPriority !== 'all' && i.priority !== state.filterPriority) return false;
     if (state.filterCategory !== 'all' && i.category !== state.filterCategory) return false;
+    if (state.filterAttach && !i._attachCount) return false;
     return true;
   });
 }
 
 function issueCardHtml(i) {
   const work = state.works.find(w => w.id === i.work_id);
-  return `<div class="issue-card priority-${i.priority}" onclick="openDetail(${i.id})">
+  return `<div class="issue-card priority-${i.priority} ${i._attachCount ? 'has-attachment' : ''}" onclick="openDetail(${i.id})">
     <div class="issue-head">
       <div class="issue-title-block">
         <div class="issue-title">${escapeHtml(i.title)}</div>
@@ -991,10 +1167,14 @@ function issueCardHtml(i) {
           <span>• ${formatTime(i.updated_at)}</span>
         </div>
       </div>
-      <div class="issue-tags">
-        <span class="tag tag-${i.priority}">${PRIORITY_LABELS[i.priority]}</span>
-        <span class="tag tag-${i.status}">${STATUS_LABELS[i.status]}</span>
-        ${i.category ? `<span class="tag tag-category">${escapeHtml(i.category)}</span>` : ''}
+      <div class="issue-right">
+        <div class="issue-tags">
+          <span class="tag tag-${i.priority}">${PRIORITY_LABELS[i.priority]}</span>
+          <span class="tag tag-${i.status}">${STATUS_LABELS[i.status]}</span>
+          ${i.category ? `<span class="tag tag-category">${escapeHtml(i.category)}</span>` : ''}
+          ${i._attachCount ? `<span class="tag tag-attach">📎 ${i._attachCount}</span>` : ''}
+        </div>
+        ${i._thumb ? `<div class="card-thumb" onclick="event.stopPropagation(); openLightbox('${escapeHtml(i._thumb)}')"><img src="${escapeHtml(i._thumb)}" alt="" loading="lazy">${i._attachCount > 1 ? `<span class="card-thumb-more">+${i._attachCount - 1}</span>` : ''}</div>` : ''}
       </div>
     </div>
     ${i.description ? `<div class="issue-desc">${escapeHtml(i.description)}</div>` : ''}
@@ -1093,6 +1273,9 @@ function openIssueModal(issue = null) {
   $('#issueStatus').value = issue?.status || 'open';
   $('#issueReporter').value = issue?.reporter || '';
   $('#issueAssignee').value = issue?.assignee || '';
+  state.stagedFiles = [];
+  $('#stagedThumbs').innerHTML = '';
+  $('#issueFileInput').value = '';
   $('#issueModal').classList.add('active');
   setTimeout(()=>$('#issueTitle').focus(), 50);
 }
@@ -1136,17 +1319,151 @@ async function saveIssue() {
   if (!payload.title) { btn.disabled=false; return showToast('제목을 입력하세요', 'error'); }
   if (!payload.work_id) { btn.disabled=false; return showToast('작품을 선택하세요', 'error'); }
 
-  let error;
+  let error, savedId = state.editingIssueId;
   if (state.editingIssueId) {
     ({ error } = await sb.from('qa_issues').update(payload).eq('id', state.editingIssueId));
   } else {
-    ({ error } = await sb.from('qa_issues').insert(payload));
+    const { data, error: insErr } = await sb.from('qa_issues').insert(payload).select('id').single();
+    error = insErr;
+    if (data) savedId = data.id;
   }
+  if (error) { btn.disabled = false; return showToast('저장 실패: '+error.message, 'error'); }
+
+  // 스테이징된 이미지 업로드
+  if (state.stagedFiles.length && savedId) {
+    btn.textContent = '이미지 업로드 중...';
+    for (const f of state.stagedFiles) {
+      await uploadAttachment(savedId, f, payload.reporter);
+    }
+  }
+
   btn.disabled = false;
-  if (error) return showToast('저장 실패: '+error.message, 'error');
+  btn.textContent = '저장';
+  state.stagedFiles = [];
   closeModal('issueModal');
   showToast(state.editingIssueId ? '이슈가 수정되었습니다' : '이슈가 등록되었습니다');
   await loadIssues();
+}
+
+// ========== 이미지 첨부 ==========
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_TYPES = ['image/png','image/jpeg','image/jpg','image/gif','image/webp'];
+
+function validateImage(file) {
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    showToast('이미지 파일만 첨부 가능합니다 (PNG/JPG/GIF/WEBP)', 'error');
+    return false;
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    showToast('파일 크기는 10MB 이하여야 합니다', 'error');
+    return false;
+  }
+  return true;
+}
+
+// 등록 모달: 저장 전 파일 스테이징
+function handleStagedFiles(event) {
+  const files = Array.from(event.target.files || []);
+  addStagedFiles(files);
+  event.target.value = '';
+}
+
+function addStagedFiles(files) {
+  files.forEach(file => {
+    if (!validateImage(file)) return;
+    const preview = URL.createObjectURL(file);
+    state.stagedFiles.push({ file, preview });
+  });
+  renderStagedThumbs();
+}
+
+function renderStagedThumbs() {
+  const grid = $('#stagedThumbs');
+  grid.innerHTML = state.stagedFiles.map((s, idx) => `
+    <div class="thumb" onclick="openLightbox('${s.preview}')">
+      <img src="${s.preview}" alt="">
+      <button class="thumb-remove" onclick="event.stopPropagation(); removeStagedFile(${idx})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeStagedFile(idx) {
+  URL.revokeObjectURL(state.stagedFiles[idx].preview);
+  state.stagedFiles.splice(idx, 1);
+  renderStagedThumbs();
+}
+
+// 실제 Supabase Storage 업로드
+async function uploadAttachment(issueId, staged, uploadedBy) {
+  const file = staged.file;
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+  const path = `issue-${issueId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const { error: upErr } = await sb.storage.from('qa-images').upload(path, file, {
+    contentType: file.type, upsert: false
+  });
+  if (upErr) { showToast('이미지 업로드 실패: '+upErr.message, 'error'); return; }
+  const { data: pub } = sb.storage.from('qa-images').getPublicUrl(path);
+  const { error: dbErr } = await sb.from('qa_attachments').insert({
+    issue_id: issueId,
+    file_path: path,
+    public_url: pub.publicUrl,
+    file_name: file.name,
+    uploaded_by: uploadedBy || null
+  });
+  if (dbErr) { showToast('첨부 정보 저장 실패: '+dbErr.message, 'error'); }
+}
+
+// 상세 모달: 즉시 업로드
+async function handleDetailUpload(event) {
+  const files = Array.from(event.target.files || []);
+  event.target.value = '';
+  if (!files.length) return;
+  const author = localStorage.getItem('qa_user_name') || null;
+  showToast(`이미지 ${files.length}개 업로드 중...`);
+  for (const file of files) {
+    if (!validateImage(file)) continue;
+    await uploadAttachment(state.currentIssueId, { file }, author);
+  }
+  showToast('이미지가 첨부되었습니다');
+  loadAttachments(state.currentIssueId);
+}
+
+async function loadAttachments(issueId) {
+  const { data, error } = await sb.from('qa_attachments').select('*').eq('issue_id', issueId).order('created_at');
+  const grid = $('#attachmentGrid');
+  if (!grid) return;
+  const countEl = $('#attachmentCount');
+  if (error) { grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">첨부 로드 실패</div>'; return; }
+  if (countEl) countEl.textContent = (data || []).length;
+  if (!data || data.length === 0) {
+    grid.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:4px 0;">첨부된 이미지가 없습니다</div>';
+    return;
+  }
+  grid.innerHTML = data.map(a => `
+    <div class="thumb" onclick="openLightbox('${a.public_url}')">
+      <img src="${escapeHtml(a.public_url)}" alt="${escapeHtml(a.file_name||'')}" loading="lazy">
+      <button class="thumb-remove" onclick="event.stopPropagation(); deleteAttachment(${a.id}, '${escapeHtml(a.file_path)}')">✕</button>
+    </div>
+  `).join('');
+}
+
+async function deleteAttachment(attId, filePath) {
+  if (!confirm('이 이미지를 삭제하시겠습니까?')) return;
+  await sb.storage.from('qa-images').remove([filePath]);
+  const { error } = await sb.from('qa_attachments').delete().eq('id', attId);
+  if (error) return showToast('삭제 실패: '+error.message, 'error');
+  showToast('이미지가 삭제되었습니다');
+  loadAttachments(state.currentIssueId);
+}
+
+// Lightbox
+function openLightbox(url) {
+  $('#lightboxImg').src = url;
+  $('#lightbox').classList.add('active');
+}
+function closeLightbox() {
+  $('#lightbox').classList.remove('active');
+  $('#lightboxImg').src = '';
 }
 
 async function openDetail(id) {
@@ -1175,6 +1492,15 @@ async function openDetail(id) {
     </div>
 
     <div class="detail-section">
+      <div class="detail-section-title">첨부 이미지 <span class="count" id="attachmentCount">·</span></div>
+      <div class="thumb-grid" id="attachmentGrid"><div style="color:var(--text-muted);font-size:13px;">로딩...</div></div>
+      <div style="margin-top:10px;">
+        <input type="file" id="detailFileInput" accept="image/*" multiple style="display:none" onchange="handleDetailUpload(event)">
+        <button class="btn btn-sm" onclick="document.getElementById('detailFileInput').click()">＋ 이미지 추가</button>
+      </div>
+    </div>
+
+    <div class="detail-section">
       <div class="detail-section-title">상태 변경</div>
       <div style="display:flex; gap:6px; flex-wrap:wrap;">
         ${Object.entries(STATUS_LABELS).map(([k,v]) =>
@@ -1196,6 +1522,7 @@ async function openDetail(id) {
 
   $('#detailModal').classList.add('active');
   loadComments(id);
+  loadAttachments(id);
 }
 
 async function loadComments(issueId) {
@@ -1343,8 +1670,43 @@ function subscribeRealtime() {
         loadComments(state.currentIssueId);
       }
     })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_attachments' }, payload => {
+      if (state.currentIssueId && $('#detailModal').classList.contains('active')) {
+        loadAttachments(state.currentIssueId);
+      }
+    })
     .subscribe();
 }
+
+// 등록 모달 드래그앤드롭
+const uploadZone = $('#issueUploadZone');
+if (uploadZone) {
+  ['dragenter','dragover'].forEach(ev => uploadZone.addEventListener(ev, e => {
+    e.preventDefault(); uploadZone.classList.add('dragover');
+  }));
+  ['dragleave','drop'].forEach(ev => uploadZone.addEventListener(ev, e => {
+    e.preventDefault(); uploadZone.classList.remove('dragover');
+  }));
+  uploadZone.addEventListener('drop', e => {
+    const files = Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/'));
+    if (files.length) addStagedFiles(files);
+  });
+}
+
+// 등록 모달 열려있을 때 붙여넣기(Ctrl+V)
+document.addEventListener('paste', e => {
+  if (!$('#issueModal').classList.contains('active')) return;
+  const items = Array.from(e.clipboardData?.items || []);
+  const files = items.filter(it => it.type.startsWith('image/')).map(it => it.getAsFile()).filter(Boolean);
+  if (files.length) { addStagedFiles(files); showToast('붙여넣은 이미지가 첨부되었습니다'); }
+});
+
+// ESC로 라이트박스/모달 닫기
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if ($('#lightbox').classList.contains('active')) { closeLightbox(); return; }
+  $$('.modal-backdrop.active').forEach(m => m.classList.remove('active'));
+});
 
 // Init
 (async () => {
