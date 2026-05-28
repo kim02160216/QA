@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovelChat QA 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg-base: #0a0b0d;
+    --bg-elev-1: #111317;
+    --bg-elev-2: #181b21;
+    --bg-elev-3: #1f232b;
+    --border: #2a2f38;
+    --border-strong: #3a414c;
+    --text-primary: #e8eaed;
+    --text-secondary: #9da4ae;
+    --text-muted: #6b7280;
+    --accent: #ff6b35;
+    --accent-soft: rgba(255, 107, 53, 0.12);
+    --critical: #ef4444;
+    --critical-soft: rgba(239, 68, 68, 0.12);
+    --high: #f59e0b;
+    --high-soft: rgba(245, 158, 11, 0.12);
+    --medium: #3b82f6;
+    --medium-soft: rgba(59, 130, 246, 0.12);
+    --low: #6b7280;
+    --low-soft: rgba(107, 114, 128, 0.12);
+    --success: #10b981;
+    --success-soft: rgba(16, 185, 129, 0.12);
+    --testing: #a855f7;
+    --testing-soft: rgba(168, 85, 247, 0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Header */
+  .header {
+    background: var(--bg-elev-1);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .header-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), #ff8c61);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: white;
+    font-size: 13px;
+  }
+  .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .logo-text span { color: var(--text-muted); font-weight: 500; }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .share-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    background: var(--bg-elev-2);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  /* Layout */
+  .layout {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky;
+    top: 96px;
+    height: fit-content;
+  }
+  .sidebar-section { margin-bottom: 24px; }
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    padding: 0 8px;
+  }
+  .work-list { display: flex; flex-direction: column; gap: 2px; }
+  .work-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .work-item:hover { background: var(--bg-elev-2); color: var(--text-primary); }
+  .work-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .work-item .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-elev-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .work-item.active .count { background: rgba(255, 107, 53, 0.2); color: var(--accent); }
+
+  .btn {
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elev-2);
+    color: var(--text-primary);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { background: var(--bg-elev-3); border-color: var(--text-muted); }
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #ff7a47; border-color: #ff7a47; }
+  .btn-ghost { background: transparent; border-color: transparent; color: var(--text-secondary); }
+  .btn-ghost:hover { background: var(--bg-elev-2); color: var(--text-primary); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-block { width: 100%; justify-content: center; }
+
+  /* Main */
+  .main { min-width: 0; }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 16px;
+  }
+  .toolbar-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .toolbar-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .toolbar-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 4px 8px;
+    background: var(--bg-elev-2);
+    border-radius: 4px;
+  }
+  .toolbar-right { display: flex; gap: 8px; }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-chip {
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev-1);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-chip:hover { border-color: var(--text-muted); color: var(--text-primary); }
+  .filter-chip.active {
+    background: var(--bg-elev-3);
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+  }
+  .filter-chip .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--bg-elev-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* Issue list */
+  .issue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .issue-card {
+    background: var(--bg-elev-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+  }
+  .issue-card:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-elev-2);
+  }
+  .issue-card.priority-critical { border-left: 3px solid var(--critical); }
+  .issue-card.priority-high { border-left: 3px solid var(--high); }
+  .issue-card.priority-medium { border-left: 3px solid var(--medium); }
+  .issue-card.priority-low { border-left: 3px solid var(--low); }
+
+  .issue-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .issue-title-block { flex: 1; min-width: 0; }
+  .issue-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .issue-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+  .issue-meta .id {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+  }
+  .issue-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-top: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .issue-tags { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tag-critical { background: var(--critical-soft); color: var(--critical); }
+  .tag-high { background: var(--high-soft); color: var(--high); }
+  .tag-medium { background: var(--medium-soft); color: var(--medium); }
+  .tag-low { background: var(--low-soft); color: var(--low); }
+  .tag-open { background: var(--medium-soft); color: var(--medium); }
+  .tag-in_progress { background: var(--high-soft); color: var(--high); }
+  .tag-testing { background: var(--testing-soft); color: var(--testing); }
+  .tag-resolved { background: var(--success-soft); color: var(--success); }
+  .tag-closed { background: var(--low-soft); color: var(--low); }
+  .tag-category {
+    background: var(--bg-elev-3);
+    color: var(--text-secondary);
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: 'Pretendard', sans-serif;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+  .modal-backdrop.active { display: flex; }
+  .modal {
+    background: var(--bg-elev-1);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 20px;
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: var(--bg-elev-2); color: var(--text-primary); }
+  .modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* Form */
+  .form-row { margin-bottom: 16px; }
+  .form-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.12s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+  }
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239da4ae' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  /* Issue detail */
+  .detail-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 14px;
+    background: var(--bg-elev-2);
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .detail-meta-item .label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .detail-meta-item .value { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .detail-desc {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.65;
+    white-space: pre-wrap;
+    padding: 14px;
+    background: var(--bg-elev-2);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .detail-section { margin-top: 20px; }
+  .detail-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .detail-section-title .count {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    background: var(--bg-elev-3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  /* Comments */
+  .comment-list { display: flex; flex-direction: column; gap: 8px; }
+  .comment {
+    background: var(--bg-elev-2);
+    border-left: 2px solid var(--border-strong);
+    padding: 10px 12px;
+    border-radius: 0 6px 6px 0;
+  }
+  .comment-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .comment-author { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .comment-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .comment-content { font-size: 13px; color: var(--text-secondary); line-height: 1.55; white-space: pre-wrap; }
+  .comment-form { margin-top: 10px; display: flex; gap: 8px; }
+  .comment-form .form-input { flex: 1; }
+  .comment-form .author-input { max-width: 110px; }
+
+  /* Empty */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-text { font-size: 14px; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-elev-3);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    z-index: 300;
+    transition: transform 0.25s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--success); }
+  .toast.error { border-color: var(--critical); }
+
+  @media (max-width: 1024px) {
+    .layout { grid-template-columns: 1fr; padding: 16px; }
+    .sidebar { position: static; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .header { padding: 16px 20px; }
+    .detail-meta { grid-template-columns: repeat(2, 1fr); }
+    .form-row-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">QA</div>
+      <div class="logo-text">NovelChat QA <span>/ 작품별 이슈 관리</span></div>
+    </div>
+    <div class="header-actions">
+      <span class="share-info" id="shareInfo">공유 가능 · 실시간 동기화</span>
+      <button class="btn btn-sm" onclick="copyShareLink()">🔗 링크 복사</button>
+      <button class="btn btn-primary btn-sm" onclick="openIssueModal()">＋ 이슈 등록</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">작품</div>
+      <div class="work-list" id="workList">
+        <div class="loading" style="padding: 20px;">로딩 중...</div>
+      </div>
+      <button class="btn btn-ghost btn-sm btn-block" style="margin-top: 8px;" onclick="openWorkModal()">＋ 작품 추가</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <h1 class="toolbar-title" id="currentWorkTitle">전체</h1>
+        <span class="toolbar-meta mono" id="currentMeta">0 issues</span>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-sm" onclick="exportData()">⬇ 내보내기</button>
+      </div>
+    </div>
+
+    <div class="stats" id="statsBar"></div>
+
+    <div class="filters">
+      <span class="filter-chip active" data-filter="status" data-value="all">전체</span>
+      <span class="filter-chip" data-filter="status" data-value="open"><span class="dot" style="background:var(--medium)"></span>Open</span>
+      <span class="filter-chip" data-filter="status" data-value="in_progress"><span class="dot" style="background:var(--high)"></span>진행중</span>
+      <span class="filter-chip" data-filter="status" data-value="testing"><span class="dot" style="background:var(--testing)"></span>테스트</span>
+      <span class="filter-chip" data-filter="status" data-value="resolved"><span class="dot" style="background:var(--success)"></span>해결</span>
+      <span style="width:1px; background:var(--border); margin:0 4px;"></span>
+      <span class="filter-chip active" data-filter="priority" data-value="all">전체 우선순위</span>
+      <span class="filter-chip" data-filter="priority" data-value="critical"><span class="dot" style="background:var(--critical)"></span>Critical</span>
+      <span class="filter-chip" data-filter="priority" data-value="high"><span class="dot" style="background:var(--high)"></span>High</span>
+      <span class="filter-chip" data-filter="priority" data-value="medium"><span class="dot" style="background:var(--medium)"></span>Medium</span>
+    </div>
+
+    <div class="issue-list" id="issueList">
+      <div class="loading">로딩 중...</div>
+    </div>
+  </main>
+</div>
+
+<!-- Issue Create/Edit Modal -->
+<div class="modal-backdrop" id="issueModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="issueModalTitle">새 이슈 등록</div>
+      <button class="modal-close" onclick="closeModal('issueModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">제목 *</label>
+        <input type="text" class="form-input" id="issueTitle" placeholder="이슈 제목">
+      </div>
+      <div class="form-row-grid">
+        <div class="form-row">
+          <label class="form-label">작품 *</label>
+          <select class="form-select" id="issueWork"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">카테고리</label>
+          <select class="form-select" id="issueCategory">
+            <option value="프롬프트">프롬프트</option>
+            <option value="이미지/콘텐츠">이미지/콘텐츠</option>
+            <option value="이미지 매핑">이미지 매핑</option>
+            <option value="이미지/품질">이미지/품질</option>
+            <option value="시스템/출력">시스템/출력</option>
+            <option value="시스템/UX">시스템/UX</option>
+            <option value="UX/시스템">UX/시스템</option>
+            <option value="정책/기획">정책/기획</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-grid">
+        <div class="form-row">
+          <label class="form-label">우선순위</label>
+          <select class="form-select" id="issuePriority">
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">상태</label>
+          <select class="form-select" id="issueStatus">
+            <option value="open">Open</option>
+            <option value="in_progress">진행중</option>
+            <option value="testing">테스트 대기</option>
+            <option value="resolved">해결</option>
+            <option value="closed">종료</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-grid">
+        <div class="form-row">
+          <label class="form-label">제보자</label>
+          <input type="text" class="form-input" id="issueReporter" placeholder="이름">
+        </div>
+        <div class="form-row">
+          <label class="form-label">담당자</label>
+          <input type="text" class="form-input" id="issueAssignee" placeholder="이름 (선택)">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">상세 설명</label>
+        <textarea class="form-textarea" id="issueDesc" placeholder="이슈에 대한 상세 내용, 재현 방법, 영향 범위 등"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('issueModal')">취소</button>
+      <button class="btn btn-primary" onclick="saveIssue()" id="saveIssueBtn">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Detail Modal -->
+<div class="modal-backdrop" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="detailTitle">이슈 상세</div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="btn btn-sm" onclick="editCurrentIssue()">편집</button>
+        <button class="btn btn-sm" onclick="deleteCurrentIssue()" style="color: var(--critical); border-color: var(--critical-soft);">삭제</button>
+        <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- Work Modal -->
+<div class="modal-backdrop" id="workModal">
+  <div class="modal" style="max-width: 480px;">
+    <div class="modal-header">
+      <div class="modal-title">새 작품 추가</div>
+      <button class="modal-close" onclick="closeModal('workModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">작품명 *</label>
+        <input type="text" class="form-input" id="workName" placeholder="예: 한서현">
+      </div>
+      <div class="form-row">
+        <label class="form-label">설명</label>
+        <input type="text" class="form-input" id="workDesc" placeholder="간단한 설명 (선택)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('workModal')">취소</button>
+      <button class="btn btn-primary" onclick="saveWork()">추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://yhekwrbeababhublhfap.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hJc6kW_x-T7cILZpfd6vvA_i0nYKsg5';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const STATUS_LABELS = {
+  open: 'Open',
+  in_progress: '진행중',
+  testing: '테스트 대기',
+  resolved: '해결',
+  closed: '종료'
+};
+const PRIORITY_LABELS = {
+  critical: 'Critical',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low'
+};
+
+const state = {
+  works: [],
+  issues: [],
+  currentWorkId: null,
+  filterStatus: 'all',
+  filterPriority: 'all',
+  editingIssueId: null,
+  currentIssueId: null
+};
+
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return document.querySelectorAll(sel); }
+
+function showToast(msg, type='success') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function formatTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return '방금';
+  if (diff < 3600) return Math.floor(diff/60) + '분 전';
+  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  if (diff < 604800) return Math.floor(diff/86400) + '일 전';
+  return d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
+}
+
+async function loadWorks() {
+  const { data, error } = await sb.from('qa_works').select('*').order('id');
+  if (error) { showToast('작품 로드 실패: '+error.message, 'error'); return; }
+  state.works = data || [];
+  renderWorks();
+  renderWorkSelect();
+}
+
+async function loadIssues() {
+  const { data, error } = await sb.from('qa_issues').select('*').order('created_at', { ascending: false });
+  if (error) { showToast('이슈 로드 실패: '+error.message, 'error'); return; }
+  state.issues = data || [];
+  renderWorks();
+  render();
+}
+
+function renderWorks() {
+  const list = $('#workList');
+  const countByWork = {};
+  state.issues.forEach(i => {
+    if (['resolved','closed'].includes(i.status)) return;
+    countByWork[i.work_id] = (countByWork[i.work_id]||0) + 1;
+  });
+  const totalOpen = Object.values(countByWork).reduce((a,b)=>a+b,0);
+
+  let html = `<div class="work-item ${state.currentWorkId===null?'active':''}" onclick="selectWork(null)">
+    <span>전체 이슈</span><span class="count mono">${totalOpen}</span>
+  </div>`;
+  state.works.forEach(w => {
+    const c = countByWork[w.id] || 0;
+    html += `<div class="work-item ${state.currentWorkId===w.id?'active':''}" onclick="selectWork(${w.id})">
+      <span>${escapeHtml(w.name)}</span><span class="count mono">${c}</span>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function renderWorkSelect() {
+  const sel = $('#issueWork');
+  sel.innerHTML = state.works.map(w =>
+    `<option value="${w.id}">${escapeHtml(w.name)}</option>`
+  ).join('');
+}
+
+function selectWork(id) {
+  state.currentWorkId = id;
+  render();
+  renderWorks();
+}
+
+function setFilter(type, value) {
+  if (type === 'status') state.filterStatus = value;
+  else state.filterPriority = value;
+  $$('.filter-chip[data-filter="'+type+'"]').forEach(c => {
+    c.classList.toggle('active', c.dataset.value === value);
+  });
+  render();
+}
+
+function getFilteredIssues() {
+  return state.issues.filter(i => {
+    if (state.currentWorkId !== null && i.work_id !== state.currentWorkId) return false;
+    if (state.filterStatus !== 'all' && i.status !== state.filterStatus) return false;
+    if (state.filterPriority !== 'all' && i.priority !== state.filterPriority) return false;
+    return true;
+  });
+}
+
+function render() {
+  const issues = getFilteredIssues();
+  const work = state.works.find(w => w.id === state.currentWorkId);
+  $('#currentWorkTitle').textContent = work ? work.name : '전체 이슈';
+  $('#currentMeta').textContent = `${issues.length} issues`;
+
+  // Stats
+  const all = state.currentWorkId === null ? state.issues : state.issues.filter(i => i.work_id === state.currentWorkId);
+  const counts = {
+    total: all.length,
+    critical: all.filter(i => i.priority === 'critical' && !['resolved','closed'].includes(i.status)).length,
+    open: all.filter(i => i.status === 'open').length,
+    progress: all.filter(i => i.status === 'in_progress' || i.status === 'testing').length,
+    resolved: all.filter(i => i.status === 'resolved' || i.status === 'closed').length
+  };
+  $('#statsBar').innerHTML = `
+    <div class="stat-card"><div class="stat-label">전체</div><div class="stat-value">${counts.total}</div></div>
+    <div class="stat-card"><div class="stat-label" style="color:var(--critical)">Critical</div><div class="stat-value" style="color:var(--critical)">${counts.critical}</div></div>
+    <div class="stat-card"><div class="stat-label">Open</div><div class="stat-value">${counts.open}</div></div>
+    <div class="stat-card"><div class="stat-label">진행/테스트</div><div class="stat-value">${counts.progress}</div></div>
+    <div class="stat-card"><div class="stat-label" style="color:var(--success)">완료</div><div class="stat-value" style="color:var(--success)">${counts.resolved}</div></div>
+  `;
+
+  // Issue list
+  if (issues.length === 0) {
+    $('#issueList').innerHTML = `<div class="empty"><div class="empty-icon">∅</div><div class="empty-text">해당 조건의 이슈가 없습니다</div></div>`;
+    return;
+  }
+  // Sort: priority then created_at
+  const order = { critical: 0, high: 1, medium: 2, low: 3 };
+  issues.sort((a,b) => (order[a.priority]||9) - (order[b.priority]||9) || new Date(b.created_at) - new Date(a.created_at));
+
+  $('#issueList').innerHTML = issues.map(i => {
+    const work = state.works.find(w => w.id === i.work_id);
+    return `<div class="issue-card priority-${i.priority}" onclick="openDetail(${i.id})">
+      <div class="issue-head">
+        <div class="issue-title-block">
+          <div class="issue-title">${escapeHtml(i.title)}</div>
+          <div class="issue-meta">
+            <span class="id mono">#${String(i.id).padStart(3,'0')}</span>
+            <span>${work ? escapeHtml(work.name) : '-'}</span>
+            ${i.reporter ? `<span>• 제보 ${escapeHtml(i.reporter)}</span>` : ''}
+            ${i.assignee ? `<span>• 담당 ${escapeHtml(i.assignee)}</span>` : ''}
+            <span>• ${formatTime(i.updated_at)}</span>
+          </div>
+        </div>
+        <div class="issue-tags">
+          <span class="tag tag-${i.priority}">${PRIORITY_LABELS[i.priority]}</span>
+          <span class="tag tag-${i.status}">${STATUS_LABELS[i.status]}</span>
+          ${i.category ? `<span class="tag tag-category">${escapeHtml(i.category)}</span>` : ''}
+        </div>
+      </div>
+      ${i.description ? `<div class="issue-desc">${escapeHtml(i.description)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Modals
+function openIssueModal(issue = null) {
+  state.editingIssueId = issue ? issue.id : null;
+  $('#issueModalTitle').textContent = issue ? '이슈 편집' : '새 이슈 등록';
+  $('#issueTitle').value = issue?.title || '';
+  $('#issueDesc').value = issue?.description || '';
+  $('#issueWork').value = issue?.work_id || (state.currentWorkId || (state.works[0]?.id || ''));
+  $('#issueCategory').value = issue?.category || '프롬프트';
+  $('#issuePriority').value = issue?.priority || 'medium';
+  $('#issueStatus').value = issue?.status || 'open';
+  $('#issueReporter').value = issue?.reporter || '';
+  $('#issueAssignee').value = issue?.assignee || '';
+  $('#issueModal').classList.add('active');
+  setTimeout(()=>$('#issueTitle').focus(), 50);
+}
+
+function openWorkModal() {
+  $('#workName').value = '';
+  $('#workDesc').value = '';
+  $('#workModal').classList.add('active');
+  setTimeout(()=>$('#workName').focus(), 50);
+}
+
+function closeModal(id) {
+  $('#'+id).classList.remove('active');
+}
+
+async function saveWork() {
+  const name = $('#workName').value.trim();
+  const desc = $('#workDesc').value.trim();
+  if (!name) return showToast('작품명을 입력하세요', 'error');
+  const { error } = await sb.from('qa_works').insert({ name, description: desc });
+  if (error) return showToast('저장 실패: '+error.message, 'error');
+  closeModal('workModal');
+  showToast('작품이 추가되었습니다');
+  await loadWorks();
+  await loadIssues();
+}
+
+async function saveIssue() {
+  const btn = $('#saveIssueBtn');
+  btn.disabled = true;
+  const payload = {
+    title: $('#issueTitle').value.trim(),
+    description: $('#issueDesc').value.trim() || null,
+    work_id: parseInt($('#issueWork').value) || null,
+    category: $('#issueCategory').value,
+    priority: $('#issuePriority').value,
+    status: $('#issueStatus').value,
+    reporter: $('#issueReporter').value.trim() || null,
+    assignee: $('#issueAssignee').value.trim() || null
+  };
+  if (!payload.title) { btn.disabled=false; return showToast('제목을 입력하세요', 'error'); }
+  if (!payload.work_id) { btn.disabled=false; return showToast('작품을 선택하세요', 'error'); }
+
+  let error;
+  if (state.editingIssueId) {
+    ({ error } = await sb.from('qa_issues').update(payload).eq('id', state.editingIssueId));
+  } else {
+    ({ error } = await sb.from('qa_issues').insert(payload));
+  }
+  btn.disabled = false;
+  if (error) return showToast('저장 실패: '+error.message, 'error');
+  closeModal('issueModal');
+  showToast(state.editingIssueId ? '이슈가 수정되었습니다' : '이슈가 등록되었습니다');
+  await loadIssues();
+}
+
+async function openDetail(id) {
+  state.currentIssueId = id;
+  const issue = state.issues.find(i => i.id === id);
+  if (!issue) return;
+  const work = state.works.find(w => w.id === issue.work_id);
+
+  $('#detailTitle').textContent = `#${String(issue.id).padStart(3,'0')} ${issue.title}`;
+
+  $('#detailBody').innerHTML = `
+    <div class="detail-meta">
+      <div class="detail-meta-item"><div class="label">작품</div><div class="value">${work ? escapeHtml(work.name) : '-'}</div></div>
+      <div class="detail-meta-item"><div class="label">우선순위</div><div class="value"><span class="tag tag-${issue.priority}">${PRIORITY_LABELS[issue.priority]}</span></div></div>
+      <div class="detail-meta-item"><div class="label">상태</div><div class="value"><span class="tag tag-${issue.status}">${STATUS_LABELS[issue.status]}</span></div></div>
+      <div class="detail-meta-item"><div class="label">카테고리</div><div class="value">${issue.category ? escapeHtml(issue.category) : '-'}</div></div>
+      <div class="detail-meta-item"><div class="label">제보자</div><div class="value">${issue.reporter ? escapeHtml(issue.reporter) : '-'}</div></div>
+      <div class="detail-meta-item"><div class="label">담당자</div><div class="value">${issue.assignee ? escapeHtml(issue.assignee) : '-'}</div></div>
+      <div class="detail-meta-item"><div class="label">등록일</div><div class="value mono" style="font-size:12px">${new Date(issue.created_at).toLocaleString('ko-KR')}</div></div>
+      <div class="detail-meta-item"><div class="label">최종수정</div><div class="value mono" style="font-size:12px">${new Date(issue.updated_at).toLocaleString('ko-KR')}</div></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">상세 설명</div>
+      <div class="detail-desc">${issue.description ? escapeHtml(issue.description) : '(설명 없음)'}</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">상태 변경</div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        ${Object.entries(STATUS_LABELS).map(([k,v]) =>
+          `<button class="btn btn-sm ${issue.status===k?'btn-primary':''}" onclick="updateStatus(${issue.id}, '${k}')">${v}</button>`
+        ).join('')}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">코멘트 <span class="count" id="commentCount">·</span></div>
+      <div class="comment-list" id="commentList"><div class="loading" style="padding:20px;">로딩...</div></div>
+      <div class="comment-form">
+        <input type="text" class="form-input author-input" id="commentAuthor" placeholder="이름" value="${localStorage.getItem('qa_user_name') || ''}">
+        <input type="text" class="form-input" id="commentContent" placeholder="코멘트 작성 후 Enter" onkeydown="if(event.key==='Enter')addComment()">
+        <button class="btn btn-primary btn-sm" onclick="addComment()">등록</button>
+      </div>
+    </div>
+  `;
+
+  $('#detailModal').classList.add('active');
+  loadComments(id);
+}
+
+async function loadComments(issueId) {
+  const { data, error } = await sb.from('qa_comments').select('*').eq('issue_id', issueId).order('created_at');
+  const list = $('#commentList');
+  if (error) { list.innerHTML = '<div class="empty">코멘트 로드 실패</div>'; return; }
+  $('#commentCount').textContent = (data || []).length;
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:8px 0;">아직 코멘트가 없습니다</div>';
+    return;
+  }
+  list.innerHTML = data.map(c => `
+    <div class="comment">
+      <div class="comment-head">
+        <div class="comment-author">${escapeHtml(c.author)}</div>
+        <div class="comment-time">${formatTime(c.created_at)}</div>
+      </div>
+      <div class="comment-content">${escapeHtml(c.content)}</div>
+    </div>
+  `).join('');
+}
+
+async function addComment() {
+  const author = $('#commentAuthor').value.trim();
+  const content = $('#commentContent').value.trim();
+  if (!author) return showToast('이름을 입력하세요', 'error');
+  if (!content) return showToast('내용을 입력하세요', 'error');
+  localStorage.setItem('qa_user_name', author);
+  const { error } = await sb.from('qa_comments').insert({
+    issue_id: state.currentIssueId, author, content
+  });
+  if (error) return showToast('코멘트 등록 실패: '+error.message, 'error');
+  $('#commentContent').value = '';
+  loadComments(state.currentIssueId);
+}
+
+async function updateStatus(issueId, status) {
+  const patch = { status };
+  if (status === 'resolved' || status === 'closed') patch.resolved_at = new Date().toISOString();
+  else patch.resolved_at = null;
+  const { error } = await sb.from('qa_issues').update(patch).eq('id', issueId);
+  if (error) return showToast('상태 변경 실패: '+error.message, 'error');
+  showToast(`상태가 "${STATUS_LABELS[status]}"(으)로 변경되었습니다`);
+  await loadIssues();
+  openDetail(issueId);
+}
+
+function editCurrentIssue() {
+  const issue = state.issues.find(i => i.id === state.currentIssueId);
+  if (!issue) return;
+  closeModal('detailModal');
+  openIssueModal(issue);
+}
+
+async function deleteCurrentIssue() {
+  if (!confirm('이 이슈를 삭제하시겠습니까? 코멘트도 함께 삭제됩니다.')) return;
+  const { error } = await sb.from('qa_issues').delete().eq('id', state.currentIssueId);
+  if (error) return showToast('삭제 실패: '+error.message, 'error');
+  closeModal('detailModal');
+  showToast('이슈가 삭제되었습니다');
+  await loadIssues();
+}
+
+function copyShareLink() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('공유 링크가 복사되었습니다');
+  }).catch(() => {
+    showToast('복사 실패. 주소창에서 직접 복사해주세요.', 'error');
+  });
+}
+
+function exportData() {
+  const issues = getFilteredIssues();
+  const work = state.works.find(w => w.id === state.currentWorkId);
+  const lines = [];
+  lines.push(`# NovelChat QA 리포트 - ${work ? work.name : '전체'}`);
+  lines.push(`생성일시: ${new Date().toLocaleString('ko-KR')}`);
+  lines.push(`이슈 수: ${issues.length}건`);
+  lines.push('');
+  issues.forEach(i => {
+    const w = state.works.find(x => x.id === i.work_id);
+    lines.push(`## #${String(i.id).padStart(3,'0')} [${PRIORITY_LABELS[i.priority]}] ${i.title}`);
+    lines.push(`- 작품: ${w?.name || '-'}`);
+    lines.push(`- 상태: ${STATUS_LABELS[i.status]}`);
+    lines.push(`- 카테고리: ${i.category || '-'}`);
+    lines.push(`- 제보: ${i.reporter || '-'} / 담당: ${i.assignee || '-'}`);
+    if (i.description) {
+      lines.push(`- 내용:`);
+      lines.push(i.description.split('\n').map(l => '  ' + l).join('\n'));
+    }
+    lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `qa-report-${(work?.name || 'all').replace(/\s/g,'_')}-${new Date().toISOString().slice(0,10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('마크다운 리포트가 다운로드되었습니다');
+}
+
+// Filter chip listeners
+$$('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => setFilter(chip.dataset.filter, chip.dataset.value));
+});
+
+// Click outside modal to close
+$$('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) m.classList.remove('active');
+  });
+});
+
+// Realtime subscription
+function subscribeRealtime() {
+  sb.channel('qa-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_issues' }, () => loadIssues())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_works' }, () => loadWorks())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_comments' }, payload => {
+      if (state.currentIssueId && $('#detailModal').classList.contains('active')) {
+        loadComments(state.currentIssueId);
+      }
+    })
+    .subscribe();
+}
+
+// Init
+(async () => {
+  await loadWorks();
+  await loadIssues();
+  subscribeRealtime();
+})();
+</script>
+</body>
+</html>
