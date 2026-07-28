@@ -2,1718 +2,333 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chatple QA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181C">
+<title>규제 검토 — 성폭력처벌법 제14조의4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-base: #0a0b0d;
-    --bg-elev-1: #111317;
-    --bg-elev-2: #181b21;
-    --bg-elev-3: #1f232b;
-    --border: #2a2f38;
-    --border-strong: #3a414c;
-    --text-primary: #e8eaed;
-    --text-secondary: #9da4ae;
-    --text-muted: #6b7280;
-    --accent: #ff6b35;
-    --accent-soft: rgba(255, 107, 53, 0.12);
-    --critical: #ef4444;
-    --critical-soft: rgba(239, 68, 68, 0.12);
-    --high: #f59e0b;
-    --high-soft: rgba(245, 158, 11, 0.12);
-    --medium: #3b82f6;
-    --medium-soft: rgba(59, 130, 246, 0.12);
-    --low: #6b7280;
-    --low-soft: rgba(107, 114, 128, 0.12);
-    --success: #10b981;
-    --success-soft: rgba(16, 185, 129, 0.12);
-    --testing: #a855f7;
-    --testing-soft: rgba(168, 85, 247, 0.12);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Pretendard', -apple-system, sans-serif;
-    background: var(--bg-base);
-    color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-  .mono { font-family: 'JetBrains Mono', monospace; }
+:root{
+  --ink:#14181C;
+  --raise:#1C2228;
+  --line:#2C343B;
+  --paper:#E8E4DA;
+  --dim:#8E979C;
+  --celadon:#7FA89B;
+  --injoo:#C05A4E;
+  --serif:'Noto Serif KR', serif;
+  --sans:'IBM Plex Sans KR', -apple-system, sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--sans);
+  font-weight:300;
+  font-size:15px;
+  line-height:1.72;
+  letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 64px;
+}
+.wrap{max-width:460px;margin:0 auto;padding:0 20px;}
 
-  /* Header */
-  .header {
-    background: var(--bg-elev-1);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-  }
-  .header-inner {
-    max-width: 1600px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .logo-mark {
-    width: 32px; height: 32px;
-    background: linear-gradient(135deg, var(--accent), #ff8c61);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    color: white;
-    font-size: 13px;
-  }
-  .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
-  .logo-text span { color: var(--text-muted); font-weight: 500; }
+/* ── masthead ─────────────────────────── */
+.mast{padding:44px 0 26px;border-bottom:1px solid var(--line);}
+.eyebrow{
+  font-family:var(--mono);font-size:10.5px;font-weight:500;
+  letter-spacing:.22em;color:var(--celadon);text-transform:uppercase;
+  margin-bottom:18px;
+}
+.mast h1{
+  font-family:var(--serif);font-weight:700;font-size:26px;
+  line-height:1.34;letter-spacing:-.02em;
+}
+.mast h1 .sub{display:block;font-size:16px;font-weight:500;color:var(--dim);margin-top:9px;letter-spacing:0;}
+.meta{
+  font-family:var(--mono);font-size:11px;color:var(--dim);
+  margin-top:20px;display:flex;gap:14px;flex-wrap:wrap;
+}
 
-  .header-actions { display: flex; gap: 8px; align-items: center; }
-  .share-info {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-muted);
-    padding: 6px 10px;
-    background: var(--bg-elev-2);
-    border-radius: 6px;
-    border: 1px solid var(--border);
-  }
+/* ── signature: legislative track ────── */
+.track{padding:30px 0 26px;border-bottom:1px solid var(--line);}
+.track-label{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--dim);text-transform:uppercase;margin-bottom:22px;
+}
+.rail{position:relative;height:1px;background:var(--line);margin:0 6px 0;}
+.rail-fill{
+  position:absolute;left:0;top:0;height:1px;background:var(--celadon);
+  width:0;transition:width 1.5s cubic-bezier(.22,.8,.3,1) .25s;
+}
+.stops{display:flex;margin-top:-5px;}
+.stop{flex:1;text-align:center;position:relative;}
+.dot{
+  width:9px;height:9px;border-radius:50%;margin:0 auto;
+  background:var(--ink);border:1px solid var(--line);
+  transition:background .4s ease,border-color .4s ease;
+}
+.stop.done .dot{background:var(--celadon);border-color:var(--celadon);}
+.stop.now .dot{
+  background:var(--injoo);border-color:var(--injoo);
+  box-shadow:0 0 0 4px rgba(192,90,78,.16);
+}
+.stop-name{font-size:11px;color:var(--dim);margin-top:10px;letter-spacing:-.02em;}
+.stop.done .stop-name,.stop.now .stop-name{color:var(--paper);}
+.stop-date{font-family:var(--mono);font-size:9.5px;color:var(--line);margin-top:3px;}
+.stop.done .stop-date,.stop.now .stop-date{color:var(--dim);}
+.track-note{
+  margin-top:22px;font-size:13.5px;color:var(--dim);line-height:1.65;
+  padding-left:13px;border-left:2px solid var(--injoo);
+}
+.track-note b{color:var(--paper);font-weight:500;}
 
-  /* Layout */
-  .layout {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 24px 32px;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 24px;
-  }
+/* ── verdict ─────────────────────────── */
+.verdict{
+  margin:30px 0 8px;padding:24px 22px;background:var(--raise);
+  border:1px solid var(--line);border-radius:3px;
+}
+.verdict .tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  color:var(--celadon);text-transform:uppercase;
+}
+.verdict h2{
+  font-family:var(--serif);font-size:20px;font-weight:700;
+  line-height:1.5;margin:12px 0 12px;letter-spacing:-.02em;
+}
+.verdict p{font-size:14px;color:var(--dim);line-height:1.75;}
+.verdict p b{color:var(--injoo);font-weight:500;}
 
-  /* Sidebar */
-  .sidebar {
-    position: sticky;
-    top: 96px;
-    height: fit-content;
-  }
-  .sidebar-section { margin-bottom: 24px; }
-  .sidebar-title {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    padding: 0 8px;
-  }
-  .work-list { display: flex; flex-direction: column; gap: 2px; }
-  .work-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 9px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.12s;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-  .work-item:hover { background: var(--bg-elev-2); color: var(--text-primary); }
-  .work-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-  .work-item .count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-muted);
-    background: var(--bg-elev-2);
-    padding: 1px 6px;
-    border-radius: 4px;
-  }
-  .work-item.active .count { background: rgba(255, 107, 53, 0.2); color: var(--accent); }
+/* ── sections ────────────────────────── */
+.sec{padding:34px 0 4px;border-top:1px solid var(--line);margin-top:30px;}
+.sec:first-of-type{border-top:none;margin-top:8px;}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin-bottom:20px;}
+.numeral{
+  font-family:var(--mono);font-size:12px;color:var(--celadon);
+  letter-spacing:.05em;flex:0 0 auto;padding-top:2px;
+}
+.sec-head h3{font-family:var(--serif);font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.45;}
+.sec p{margin-bottom:14px;color:#C9C6BE;}
+.sec p b{color:var(--paper);font-weight:500;}
 
-  .btn {
-    border: 1px solid var(--border-strong);
-    background: var(--bg-elev-2);
-    color: var(--text-primary);
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: inherit;
-    font-weight: 500;
-    transition: all 0.12s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .btn:hover { background: var(--bg-elev-3); border-color: var(--text-muted); }
-  .btn-primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
-  }
-  .btn-primary:hover { background: #ff7a47; border-color: #ff7a47; }
-  .btn-ghost { background: transparent; border-color: transparent; color: var(--text-secondary); }
-  .btn-ghost:hover { background: var(--bg-elev-2); color: var(--text-primary); }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
-  .btn-block { width: 100%; justify-content: center; }
+/* data rows */
+.rows{border-top:1px solid var(--line);margin-bottom:18px;}
+.row{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);}
+.row dt{
+  flex:0 0 62px;font-family:var(--mono);font-size:10.5px;
+  color:var(--dim);letter-spacing:.06em;padding-top:4px;
+}
+.row dd{flex:1;font-size:14px;line-height:1.65;}
 
-  /* Main */
-  .main { min-width: 0; }
-  .toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 16px;
-  }
-  .toolbar-left { display: flex; align-items: center; gap: 12px; flex: 1; }
-  .toolbar-title {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-  .toolbar-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-muted);
-    padding: 4px 8px;
-    background: var(--bg-elev-2);
-    border-radius: 4px;
-  }
-  .toolbar-right { display: flex; gap: 8px; }
+/* statute quote */
+.statute{
+  background:var(--raise);border:1px solid var(--line);border-radius:3px;
+  padding:18px 18px 16px;margin:6px 0 20px;
+}
+.statute .cap{
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  color:var(--dim);text-transform:uppercase;margin-bottom:12px;
+}
+.statute ol{list-style:none;font-size:13.5px;line-height:1.72;color:#C9C6BE;}
+.statute li{display:flex;gap:9px;margin-bottom:9px;}
+.statute li:last-child{margin-bottom:0;}
+.statute .cir{color:var(--celadon);font-family:var(--mono);flex:0 0 auto;}
+.statute u{
+  text-decoration:none;
+  border-bottom:1.5px solid var(--injoo);
+  color:var(--paper);padding-bottom:1px;
+}
 
-  /* View toggle */
-  .view-toggle {
-    display: inline-flex;
-    background: var(--bg-elev-1);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2px;
-    gap: 2px;
-  }
-  .view-toggle-btn {
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    padding: 5px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: inherit;
-    font-weight: 500;
-    transition: all 0.12s;
-  }
-  .view-toggle-btn:hover { color: var(--text-primary); }
-  .view-toggle-btn.active {
-    background: var(--bg-elev-3);
-    color: var(--text-primary);
-  }
+/* bullet list */
+.pts{list-style:none;margin-bottom:16px;}
+.pts li{padding:11px 0 11px 16px;border-bottom:1px solid var(--line);position:relative;font-size:14px;line-height:1.68;color:#C9C6BE;}
+.pts li:before{content:'';position:absolute;left:0;top:19px;width:5px;height:1px;background:var(--celadon);}
+.pts li b{color:var(--paper);font-weight:500;}
+.pts li.warn:before{background:var(--injoo);}
 
-  /* Category group */
-  .category-group { margin-bottom: 24px; }
-  .category-group-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-  .category-group-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .category-group-name::before {
-    content: '';
-    width: 3px;
-    height: 14px;
-    background: var(--accent);
-    border-radius: 2px;
-  }
-  .category-group-count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-muted);
-    background: var(--bg-elev-2);
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  .category-group-bar {
-    flex: 1;
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  .mini-stat {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 4px;
-  }
+/* impact meter */
+.impact{margin-bottom:18px;border-top:1px solid var(--line);}
+.imp{padding:14px 0;border-bottom:1px solid var(--line);}
+.imp-top{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.imp-name{font-size:14px;color:var(--paper);letter-spacing:-.02em;}
+.imp-lv{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);white-space:nowrap;}
+.bars{display:flex;gap:3px;margin-top:9px;}
+.bar{height:3px;flex:1;background:var(--line);border-radius:2px;}
+.bar.on{background:var(--celadon);}
+.imp.high .bar.on{background:var(--injoo);}
+.imp.high .imp-lv{color:var(--injoo);}
+.imp-why{font-size:12.5px;color:var(--dim);margin-top:9px;line-height:1.6;}
 
-  .filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .filter-chip {
-    padding: 6px 12px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--bg-elev-1);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    transition: all 0.12s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .filter-chip:hover { border-color: var(--text-muted); color: var(--text-primary); }
-  .filter-chip.active {
-    background: var(--bg-elev-3);
-    border-color: var(--text-muted);
-    color: var(--text-primary);
-  }
-  .filter-chip .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-  }
+/* core risk */
+.core{
+  border:1px solid var(--injoo);border-radius:3px;
+  padding:22px 20px;margin:22px 0 6px;
+  background:linear-gradient(180deg,rgba(192,90,78,.09),rgba(192,90,78,0));
+}
+.core .cap{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  color:var(--injoo);text-transform:uppercase;margin-bottom:12px;
+}
+.core h4{font-family:var(--serif);font-size:16.5px;font-weight:700;line-height:1.55;margin-bottom:12px;letter-spacing:-.02em;}
+.core p{font-size:13.5px;color:#C9C6BE;line-height:1.75;margin-bottom:10px;}
+.core p:last-child{margin-bottom:0;}
+.core p b{color:var(--paper);font-weight:500;}
 
-  /* Stats */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  .stat-card {
-    background: var(--bg-elev-1);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
-  .stat-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-  }
-  .stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
+/* actions */
+.acts{list-style:none;counter-reset:a;}
+.acts li{
+  counter-increment:a;position:relative;padding:13px 0 13px 30px;
+  border-bottom:1px solid var(--line);font-size:14px;line-height:1.65;color:#C9C6BE;
+}
+.acts li:before{
+  content:counter(a,decimal-leading-zero);position:absolute;left:0;top:14px;
+  font-family:var(--mono);font-size:10.5px;color:var(--celadon);letter-spacing:.05em;
+}
+.acts li b{color:var(--paper);font-weight:500;}
 
-  /* Issue list */
-  .issue-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .issue-card {
-    background: var(--bg-elev-1);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px 18px;
-    cursor: pointer;
-    transition: all 0.12s;
-    position: relative;
-  }
-  .issue-card:hover {
-    border-color: var(--border-strong);
-    background: var(--bg-elev-2);
-  }
-  .issue-card.priority-critical { border-left: 3px solid var(--critical); }
-  .issue-card.priority-high { border-left: 3px solid var(--high); }
-  .issue-card.priority-medium { border-left: 3px solid var(--medium); }
-  .issue-card.priority-low { border-left: 3px solid var(--low); }
+/* foot */
+.foot{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);}
+.foot p{font-size:11.5px;color:var(--dim);line-height:1.7;font-family:var(--mono);letter-spacing:-.01em;}
 
-  .issue-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 8px;
-  }
-  .issue-title-block { flex: 1; min-width: 0; }
-  .issue-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-    letter-spacing: -0.01em;
-  }
-  .issue-meta {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    font-size: 12px;
-    color: var(--text-muted);
-    flex-wrap: wrap;
-  }
-  .issue-meta .id {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-muted);
-  }
-  .issue-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.55;
-    margin-top: 4px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .issue-tags { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
-  .issue-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-
-  /* 첨부 배지 */
-  .tag-attach {
-    background: var(--accent-soft);
-    color: var(--accent);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-
-  /* 카드 썸네일 미리보기 */
-  .card-thumb {
-    position: relative;
-    width: 56px; height: 56px;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid var(--border-strong);
-    background: var(--bg-elev-2);
-    cursor: zoom-in;
-    transition: transform 0.12s, border-color 0.12s;
-  }
-  .card-thumb:hover { transform: scale(1.05); border-color: var(--accent); }
-  .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .card-thumb-more {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    color: white;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* 첨부 있는 카드: 썸네일로 충분히 구분되므로 별도 마커 없음 */
-
-  .tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 3px 8px;
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .tag-critical { background: var(--critical-soft); color: var(--critical); }
-  .tag-high { background: var(--high-soft); color: var(--high); }
-  .tag-medium { background: var(--medium-soft); color: var(--medium); }
-  .tag-low { background: var(--low-soft); color: var(--low); }
-  .tag-open { background: var(--medium-soft); color: var(--medium); }
-  .tag-in_progress { background: var(--high-soft); color: var(--high); }
-  .tag-testing { background: var(--testing-soft); color: var(--testing); }
-  .tag-resolved { background: var(--success-soft); color: var(--success); }
-  .tag-closed { background: var(--low-soft); color: var(--low); }
-  .tag-category {
-    background: var(--bg-elev-3);
-    color: var(--text-secondary);
-    text-transform: none;
-    letter-spacing: 0;
-    font-family: 'Pretendard', sans-serif;
-  }
-
-  /* Modal */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 32px;
-  }
-  .modal-backdrop.active { display: flex; }
-  .modal {
-    background: var(--bg-elev-1);
-    border: 1px solid var(--border-strong);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 720px;
-    max-height: 90vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-  .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .modal-title {
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-  .modal-close {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 20px;
-    width: 32px; height: 32px;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal-close:hover { background: var(--bg-elev-2); color: var(--text-primary); }
-  .modal-body {
-    padding: 20px 24px;
-    overflow-y: auto;
-    flex: 1;
-  }
-  .modal-footer {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-  }
-
-  /* Form */
-  .form-row { margin-bottom: 16px; }
-  .form-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .form-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  .form-input, .form-select, .form-textarea {
-    width: 100%;
-    background: var(--bg-elev-2);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 9px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-family: inherit;
-    transition: border-color 0.12s;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-  .form-textarea {
-    resize: vertical;
-    min-height: 100px;
-    line-height: 1.55;
-  }
-  .form-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239da4ae' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 32px;
-  }
-
-  /* Upload zone */
-  .upload-zone {
-    border: 1.5px dashed var(--border-strong);
-    border-radius: 8px;
-    background: var(--bg-elev-2);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .upload-zone:hover, .upload-zone.dragover {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-  }
-  .upload-zone-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 20px 16px;
-    text-align: center;
-  }
-  .upload-icon { font-size: 22px; }
-  .upload-text { font-size: 13px; color: var(--text-secondary); }
-  .upload-hint { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
-
-  /* Thumbnail grid */
-  .thumb-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .thumb-grid:empty { margin-top: 0; }
-  .thumb {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--bg-elev-2);
-    cursor: pointer;
-  }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb-remove {
-    position: absolute;
-    top: 4px; right: 4px;
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.7);
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0;
-    transition: opacity 0.12s;
-  }
-  .thumb:hover .thumb-remove { opacity: 1; }
-  .thumb-uploading {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex; align-items: center; justify-content: center;
-    color: white;
-    font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Lightbox */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    z-index: 400;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-    cursor: zoom-out;
-  }
-  .lightbox.active { display: flex; }
-  .lightbox img {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
-  .lightbox-close {
-    position: absolute;
-    top: 24px; right: 24px;
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    background: var(--bg-elev-3);
-    border: 1px solid var(--border-strong);
-    color: var(--text-primary);
-    cursor: pointer;
-    font-size: 18px;
-  }
-
-  /* Issue detail */
-  .detail-meta {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding: 14px;
-    background: var(--bg-elev-2);
-    border-radius: 6px;
-    margin-bottom: 16px;
-  }
-  .detail-meta-item .label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.06em;
-    margin-bottom: 4px;
-  }
-  .detail-meta-item .value { font-size: 13px; color: var(--text-primary); font-weight: 500; }
-  .detail-desc {
-    font-size: 14px;
-    color: var(--text-primary);
-    line-height: 1.65;
-    white-space: pre-wrap;
-    padding: 14px;
-    background: var(--bg-elev-2);
-    border-radius: 6px;
-    border: 1px solid var(--border);
-  }
-  .detail-section { margin-top: 20px; }
-  .detail-section-title {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    letter-spacing: 0.06em;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .detail-section-title .count {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-muted);
-    background: var(--bg-elev-3);
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-  }
-
-  /* Comments */
-  .comment-list { display: flex; flex-direction: column; gap: 8px; }
-  .comment {
-    background: var(--bg-elev-2);
-    border-left: 2px solid var(--border-strong);
-    padding: 10px 12px;
-    border-radius: 0 6px 6px 0;
-  }
-  .comment-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
-  .comment-author { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-  .comment-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
-  .comment-content { font-size: 13px; color: var(--text-secondary); line-height: 1.55; white-space: pre-wrap; }
-  .comment-form { margin-top: 10px; display: flex; gap: 8px; }
-  .comment-form .form-input { flex: 1; }
-  .comment-form .author-input { max-width: 110px; }
-
-  /* Empty */
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-  }
-  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
-  .empty-text { font-size: 14px; }
-
-  /* Loading */
-  .loading {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-  }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: var(--bg-elev-3);
-    border: 1px solid var(--border-strong);
-    color: var(--text-primary);
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 13px;
-    z-index: 300;
-    transition: transform 0.25s;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success { border-color: var(--success); }
-  .toast.error { border-color: var(--critical); }
-
-  @media (max-width: 1024px) {
-    .layout { grid-template-columns: 1fr; padding: 16px; }
-    .sidebar { position: static; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .header { padding: 16px 20px; }
-    .detail-meta { grid-template-columns: repeat(2, 1fr); }
-    .form-row-grid { grid-template-columns: 1fr; }
-  }
+/* reveal */
+.rv{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s cubic-bezier(.22,.8,.3,1);}
+.rv.in{opacity:1;transform:none;}
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none;}
+  .rail-fill{transition:none;}
+}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-mark">QA</div>
-      <div class="logo-text">Chatple QA</div>
+  <header class="mast">
+    <div class="eyebrow">규제 검토 · 내부 보고</div>
+    <h1>성폭력처벌법 제14조의4 신설안
+      <span class="sub">AI 생성 성적 영상물 처벌 조항 — 현황과 당사 영향</span>
+    </h1>
+    <div class="meta"><span>2026.07.28</span><span>허영 의원 등 10인</span><span>법제사법위원회</span></div>
+  </header>
+
+  <section class="track">
+    <div class="track-label">입법 진행 단계</div>
+    <div class="rail"><div class="rail-fill" id="fill"></div></div>
+    <div class="stops">
+      <div class="stop done"><div class="dot"></div><div class="stop-name">발의</div><div class="stop-date">25.09</div></div>
+      <div class="stop done"><div class="dot"></div><div class="stop-name">회부</div><div class="stop-date">25.09</div></div>
+      <div class="stop now"><div class="dot"></div><div class="stop-name">상정</div><div class="stop-date">26.07</div></div>
+      <div class="stop"><div class="dot"></div><div class="stop-name">소위</div><div class="stop-date">—</div></div>
+      <div class="stop"><div class="dot"></div><div class="stop-name">의결</div><div class="stop-date">—</div></div>
+      <div class="stop"><div class="dot"></div><div class="stop-name">본회의</div><div class="stop-date">—</div></div>
     </div>
-    <div class="header-actions">
-      <span class="share-info" id="shareInfo">공유 가능 · 실시간 동기화</span>
-      <button class="btn btn-sm" onclick="copyShareLink()">🔗 링크 복사</button>
-      <button class="btn btn-primary btn-sm" onclick="openIssueModal()">＋ 이슈 등록</button>
+    <p class="track-note">회부에서 상정까지 <b>10개월</b>이 걸렸습니다. 상정은 심사 시작일 뿐이며, 통과까지는 세 단계가 더 남아 있습니다.</p>
+  </section>
+
+  <section class="verdict rv">
+    <div class="tag">결론</div>
+    <h2>원안 통과 가능성은 낮고, 통과되더라도 아청법 수준으로 축소될 것으로 판단합니다.</h2>
+    <p>다만 원안의 <b>동의 요건 부재</b>는 당사 실존 인물 IP 사업에 직접 타격이므로, 형량 논란과 별개로 문언 변화를 계속 추적할 필요가 있습니다.</p>
+  </section>
+
+  <section class="sec rv">
+    <div class="sec-head"><span class="numeral">Ⅰ</span><h3>현황</h3></div>
+    <dl class="rows">
+      <div class="row"><dt>법안</dt><dd>성폭력처벌법 일부개정안 제14조의4 신설</dd></div>
+      <div class="row"><dt>발의</dt><dd>허영 의원 등 10인 (2025년 9월)</dd></div>
+      <div class="row"><dt>경과</dt><dd>2025.09.12 법사위 회부 → 2026.07.27 상정</dd></div>
+      <div class="row"><dt>다음</dt><dd>법안심사제1소위 회부 (일정 미정)</dd></div>
+    </dl>
+    <div class="statute">
+      <div class="cap">신설 조문 요지</div>
+      <ol>
+        <li><span class="cir">①</span><span><u>실제 인물로 인식될 수 있는</u> 가상의 인물·표현물을 성적 형태로 제작 — 7년 이하 징역</span></li>
+        <li><span class="cir">②</span><span>반포·판매·제공·전시 — 제1항과 동일</span></li>
+        <li><span class="cir">③</span><span>소지·구입·저장 또는 <u>시청</u> — 3년 이하 징역</span></li>
+      </ol>
     </div>
-  </div>
-</header>
+    <p>실무상 관건은 형량이 아니라 밑줄 친 두 문언입니다. 어디까지가 &ldquo;실제 인물로 인식될 수 있는&rdquo;에 해당하는지, 그리고 단순 시청까지 처벌 대상에 넣는 것이 유지될 수 있는지가 심사의 핵심 쟁점이 됩니다.</p>
+  </section>
 
-<div class="layout">
-  <aside class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-title">작품</div>
-      <div class="work-list" id="workList">
-        <div class="loading" style="padding: 20px;">로딩 중...</div>
-      </div>
-      <button class="btn btn-ghost btn-sm btn-block" style="margin-top: 8px;" onclick="openWorkModal()">＋ 작품 추가</button>
-    </div>
-  </aside>
+  <section class="sec rv">
+    <div class="sec-head"><span class="numeral">Ⅱ</span><h3>통과 가능성이 낮은 이유</h3></div>
+    <ul class="pts">
+      <li><b>법익 체계 충돌 (가장 결정적).</b> 법원행정처는 가상 인물의 경우 성적 자기결정권 침해가 성립하지 않거나 불분명한데도 이를 성폭력처벌법에 넣는 것은, 개인적 법익 보호를 전제로 하는 동법 체계와 정합하지 않는다는 의견을 제시했습니다.</li>
+      <li><b>중복 입법 지적.</b> 서울대 박상철 교수는 정보통신망법상 음란물 유포로 처벌이 가능하므로 별도 규정을 둘 이유가 없다고 지적했습니다.</li>
+      <li><b>소지·시청 처벌의 전례 부재.</b> 현행법상 단순 소지·시청 처벌은 아동·청소년성착취물과 불법촬영물 두 곳뿐입니다. 성인 대상 가상물로 확대한 사례가 없어, 소위에서 제3항이 가장 먼저 삭제될 부분으로 봅니다.</li>
+      <li class="warn"><b>다만 리스크 요인.</b> 딥페이크 관련 사회적 사건이 발생하면 단기간에 통과된 전례가 있어 완전 배제는 어렵습니다.</li>
+    </ul>
+  </section>
 
-  <main class="main">
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <h1 class="toolbar-title" id="currentWorkTitle">전체</h1>
-        <span class="toolbar-meta mono" id="currentMeta">0 issues</span>
-      </div>
-      <div class="toolbar-right">
-        <div class="view-toggle">
-          <button class="view-toggle-btn active" id="viewListBtn" onclick="setView('list')">☰ 목록</button>
-          <button class="view-toggle-btn" id="viewGroupBtn" onclick="setView('group')">⊞ 태그별</button>
-        </div>
-        <button class="btn btn-sm" onclick="exportData()">⬇ 내보내기</button>
-      </div>
-    </div>
+  <section class="sec rv">
+    <div class="sec-head"><span class="numeral">Ⅲ</span><h3>예상 착지점</h3></div>
+    <p>헌법재판소는 2026년 6월 24일 청소년성보호법 제11조에 대해 재판관 전원일치로 합헌 결정을 내렸습니다. 실제 아동이 등장하지 않는 가상 이미지라도 처벌할 수 있다는 취지입니다.</p>
+    <p>즉 가상물 처벌의 헌법적 통로는 <b>아동·청소년 영역에 한해서만</b> 열려 있고, 성인 대상 가상물은 근거가 약합니다. 실질적 규제선은 이미 확정된 아청법 라인이며, 본 법안은 그 확인적 규정으로 축소되거나 소위에 계류될 가능성이 높습니다.</p>
+  </section>
 
-    <div class="stats" id="statsBar"></div>
-
-    <div class="filters">
-      <span class="filter-chip active" data-filter="status" data-value="all">전체</span>
-      <span class="filter-chip" data-filter="status" data-value="open"><span class="dot" style="background:var(--medium)"></span>Open</span>
-      <span class="filter-chip" data-filter="status" data-value="in_progress"><span class="dot" style="background:var(--high)"></span>진행중</span>
-      <span class="filter-chip" data-filter="status" data-value="testing"><span class="dot" style="background:var(--testing)"></span>테스트</span>
-      <span class="filter-chip" data-filter="status" data-value="resolved"><span class="dot" style="background:var(--success)"></span>해결</span>
-      <span style="width:1px; background:var(--border); margin:0 4px;"></span>
-      <span class="filter-chip active" data-filter="priority" data-value="all">전체 우선순위</span>
-      <span class="filter-chip" data-filter="priority" data-value="critical"><span class="dot" style="background:var(--critical)"></span>Critical</span>
-      <span class="filter-chip" data-filter="priority" data-value="high"><span class="dot" style="background:var(--high)"></span>High</span>
-      <span class="filter-chip" data-filter="priority" data-value="medium"><span class="dot" style="background:var(--medium)"></span>Medium</span>
-      <span style="width:1px; background:var(--border); margin:0 4px;"></span>
-      <span class="filter-chip" data-filter="attach" data-value="yes">📎 첨부 있음</span>
-    </div>
-
-    <div class="filters" id="categoryFilters"></div>
-
-    <div class="issue-list" id="issueList">
-      <div class="loading">로딩 중...</div>
-    </div>
-  </main>
-</div>
-
-<!-- Issue Create/Edit Modal -->
-<div class="modal-backdrop" id="issueModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="issueModalTitle">새 이슈 등록</div>
-      <button class="modal-close" onclick="closeModal('issueModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <label class="form-label">제목 *</label>
-        <input type="text" class="form-input" id="issueTitle" placeholder="이슈 제목">
+  <section class="sec rv">
+    <div class="sec-head"><span class="numeral">Ⅳ</span><h3>당사 영향</h3></div>
+    <div class="impact">
+      <div class="imp">
+        <div class="imp-top"><span class="imp-name">일러스트·애니 화풍</span><span class="imp-lv">낮음</span></div>
+        <div class="bars"><span class="bar on"></span><span class="bar"></span><span class="bar"></span></div>
+        <div class="imp-why">챗플·노벨챗 주력 라인. &ldquo;실제 인물로 인식될 수 있는&rdquo; 요건 밖에 위치</div>
       </div>
-      <div class="form-row-grid">
-        <div class="form-row">
-          <label class="form-label">작품 *</label>
-          <select class="form-select" id="issueWork"></select>
-        </div>
-        <div class="form-row">
-          <label class="form-label">카테고리</label>
-          <select class="form-select" id="issueCategory">
-            <option value="프롬프트">프롬프트</option>
-            <option value="이미지/콘텐츠">이미지/콘텐츠</option>
-            <option value="이미지 매핑">이미지 매핑</option>
-            <option value="이미지/품질">이미지/품질</option>
-            <option value="시스템/출력">시스템/출력</option>
-            <option value="시스템/UX">시스템/UX</option>
-            <option value="UX/시스템">UX/시스템</option>
-            <option value="정책/기획">정책/기획</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
+      <div class="imp">
+        <div class="imp-top"><span class="imp-name">포토리얼 계열 자산</span><span class="imp-lv">중간</span></div>
+        <div class="bars"><span class="bar on"></span><span class="bar on"></span><span class="bar"></span></div>
+        <div class="imp-why">문언상 직접 타깃. 판정 기준 수립 필요</div>
       </div>
-      <div class="form-row-grid">
-        <div class="form-row">
-          <label class="form-label">우선순위</label>
-          <select class="form-select" id="issuePriority">
-            <option value="critical">Critical</option>
-            <option value="high">High</option>
-            <option value="medium" selected>Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label class="form-label">상태</label>
-          <select class="form-select" id="issueStatus">
-            <option value="open">Open</option>
-            <option value="in_progress">진행중</option>
-            <option value="testing">테스트 대기</option>
-            <option value="resolved">해결</option>
-            <option value="closed">종료</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row-grid">
-        <div class="form-row">
-          <label class="form-label">제보자</label>
-          <input type="text" class="form-input" id="issueReporter" placeholder="이름">
-        </div>
-        <div class="form-row">
-          <label class="form-label">담당자</label>
-          <input type="text" class="form-input" id="issueAssignee" placeholder="이름 (선택)">
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">상세 설명</label>
-        <textarea class="form-textarea" id="issueDesc" placeholder="이슈에 대한 상세 내용, 재현 방법, 영향 범위 등"></textarea>
-      </div>
-      <div class="form-row">
-        <label class="form-label">이미지 첨부</label>
-        <div class="upload-zone" id="issueUploadZone" onclick="document.getElementById('issueFileInput').click()">
-          <input type="file" id="issueFileInput" accept="image/*" multiple style="display:none" onchange="handleStagedFiles(event)">
-          <div class="upload-zone-inner">
-            <span class="upload-icon">🖼️</span>
-            <span class="upload-text">클릭하거나 이미지를 드래그하세요 · 붙여넣기(Ctrl+V)도 가능</span>
-            <span class="upload-hint">PNG · JPG · GIF · WEBP / 최대 10MB</span>
-          </div>
-        </div>
-        <div class="thumb-grid" id="stagedThumbs"></div>
+      <div class="imp high">
+        <div class="imp-top"><span class="imp-name">실존 모델 라이선스 IP</span><span class="imp-lv">높음</span></div>
+        <div class="bars"><span class="bar on"></span><span class="bar on"></span><span class="bar on"></span></div>
+        <div class="imp-why">현행법상 유일한 적법 경로가 닫힐 수 있음 — 아래 참조</div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('issueModal')">취소</button>
-      <button class="btn btn-primary" onclick="saveIssue()" id="saveIssueBtn">저장</button>
+    <div class="core">
+      <div class="cap">핵심 리스크</div>
+      <h4>형량이 아니라 동의 요건이 빠진 것이 문제입니다.</h4>
+      <p>현행 제14조의2는 <b>&ldquo;의사에 반하여&rdquo;</b>가 구성요건입니다. 당사자가 동의하면 범죄 자체가 성립하지 않으며, 이것이 라이선스 기반 실존 인물 IP의 적법 근거였습니다.</p>
+      <p>그런데 원안 제14조의4에는 이 요건이 없습니다. <b>동의를 받은 실존 모델 기반 산출물도 문언상 포섭될 여지가 있습니다.</b></p>
+      <p>또한 성인인증이나 유료 폐쇄망 운영은 면책 사유가 되지 않으며, 유통이 아닌 <b>제작 자체</b>가 구성요건입니다.</p>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- Issue Detail Modal -->
-<div class="modal-backdrop" id="detailModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="detailTitle">이슈 상세</div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button class="btn btn-sm" onclick="editCurrentIssue()">편집</button>
-        <button class="btn btn-sm" onclick="deleteCurrentIssue()" style="color: var(--critical); border-color: var(--critical-soft);">삭제</button>
-        <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
-      </div>
-    </div>
-    <div class="modal-body" id="detailBody"></div>
-  </div>
-</div>
+  <section class="sec rv">
+    <div class="sec-head"><span class="numeral">Ⅴ</span><h3>대응 방향</h3></div>
+    <ol class="acts">
+      <li>법사위 제1소위 회부 및 심사 일정 <b>모니터링</b> — 특히 동의 요건 신설 여부와 제3항 존치 여부</li>
+      <li>포토리얼 자산 라인 <b>판정 기준 수립</b> — 콘텐츠 형사법 전문 변호사 검토 선행</li>
+      <li>이미 확정된 아청법 라인(연령 오인 가능성)을 <b>사내 QA 체크포인트에 우선 반영</b> — 법안과 무관하게 현재 구속력 있는 규제</li>
+      <li>화풍 기반 자산 <b>비중 유지 전략</b> 검토</li>
+    </ol>
+  </section>
 
-<!-- Work Modal -->
-<div class="modal-backdrop" id="workModal">
-  <div class="modal" style="max-width: 480px;">
-    <div class="modal-header">
-      <div class="modal-title">새 작품 추가</div>
-      <button class="modal-close" onclick="closeModal('workModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <label class="form-label">작품명 *</label>
-        <input type="text" class="form-input" id="workName" placeholder="예: 한서현">
-      </div>
-      <div class="form-row">
-        <label class="form-label">설명</label>
-        <input type="text" class="form-input" id="workDesc" placeholder="간단한 설명 (선택)">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('workModal')">취소</button>
-      <button class="btn btn-primary" onclick="saveWork()">추가</button>
-    </div>
-  </div>
-</div>
+  <footer class="foot">
+    <p>본 검토는 법률 자문이 아니며, 실제 판단은 전문 변호사 확인이 필요합니다. 법안 경과는 국회 의안정보시스템 기준 2026.07.28 현재.</p>
+  </footer>
 
-<div class="toast" id="toast"></div>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <img id="lightboxImg" src="" alt="">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://yhekwrbeababhublhfap.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_hJc6kW_x-T7cILZpfd6vvA_i0nYKsg5';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+document.addEventListener('DOMContentLoaded', function(){
+  var fill = document.getElementById('fill');
+  if (fill) { requestAnimationFrame(function(){ fill.style.width = '40%'; }); }
 
-const STATUS_LABELS = {
-  open: 'Open',
-  in_progress: '진행중',
-  testing: '테스트 대기',
-  resolved: '해결',
-  closed: '종료'
-};
-const PRIORITY_LABELS = {
-  critical: 'Critical',
-  high: 'High',
-  medium: 'Medium',
-  low: 'Low'
-};
-
-const state = {
-  works: [],
-  issues: [],
-  currentWorkId: null,
-  filterStatus: 'all',
-  filterPriority: 'all',
-  filterCategory: 'all',
-  filterAttach: false,
-  view: 'list',
-  editingIssueId: null,
-  currentIssueId: null,
-  stagedFiles: []
-};
-
-function $(sel) { return document.querySelector(sel); }
-function $$(sel) { return document.querySelectorAll(sel); }
-
-function showToast(msg, type='success') {
-  const t = $('#toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(()=>t.classList.remove('show'), 2500);
-}
-
-function formatTime(iso) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = (now - d) / 1000;
-  if (diff < 60) return '방금';
-  if (diff < 3600) return Math.floor(diff/60) + '분 전';
-  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
-  if (diff < 604800) return Math.floor(diff/86400) + '일 전';
-  return d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
-}
-
-async function loadWorks() {
-  const { data, error } = await sb.from('qa_works').select('*').order('id');
-  if (error) { showToast('작품 로드 실패: '+error.message, 'error'); return; }
-  state.works = data || [];
-  renderWorks();
-  renderWorkSelect();
-}
-
-async function loadIssues() {
-  const { data, error } = await sb.from('qa_issues').select('*').order('created_at', { ascending: false });
-  if (error) { showToast('이슈 로드 실패: '+error.message, 'error'); return; }
-  state.issues = data || [];
-  // 첨부 개수 + 대표 썸네일 집계
-  try {
-    const { data: atts } = await sb.from('qa_attachments')
-      .select('issue_id, public_url').order('created_at', { ascending: true });
-    const counts = {}, thumbs = {};
-    (atts || []).forEach(a => {
-      counts[a.issue_id] = (counts[a.issue_id]||0) + 1;
-      if (!thumbs[a.issue_id]) thumbs[a.issue_id] = a.public_url; // 가장 먼저 올린 이미지를 대표로
-    });
-    state.issues.forEach(i => {
-      i._attachCount = counts[i.id] || 0;
-      i._thumb = thumbs[i.id] || null;
-    });
-  } catch(e) { /* 첨부 집계 실패해도 무시 */ }
-  renderWorks();
-  render();
-}
-
-function renderWorks() {
-  const list = $('#workList');
-  const countByWork = {};
-  state.issues.forEach(i => {
-    if (['resolved','closed'].includes(i.status)) return;
-    countByWork[i.work_id] = (countByWork[i.work_id]||0) + 1;
-  });
-  const totalOpen = Object.values(countByWork).reduce((a,b)=>a+b,0);
-
-  let html = `<div class="work-item ${state.currentWorkId===null?'active':''}" onclick="selectWork(null)">
-    <span>전체 이슈</span><span class="count mono">${totalOpen}</span>
-  </div>`;
-  state.works.forEach(w => {
-    const c = countByWork[w.id] || 0;
-    html += `<div class="work-item ${state.currentWorkId===w.id?'active':''}" onclick="selectWork(${w.id})">
-      <span>${escapeHtml(w.name)}</span><span class="count mono">${c}</span>
-    </div>`;
-  });
-  list.innerHTML = html;
-}
-
-function renderWorkSelect() {
-  const sel = $('#issueWork');
-  sel.innerHTML = state.works.map(w =>
-    `<option value="${w.id}">${escapeHtml(w.name)}</option>`
-  ).join('');
-}
-
-function selectWork(id) {
-  state.currentWorkId = id;
-  render();
-  renderWorks();
-}
-
-function setFilter(type, value) {
-  if (type === 'status') state.filterStatus = value;
-  else if (type === 'priority') state.filterPriority = value;
-  else if (type === 'category') state.filterCategory = value;
-  else if (type === 'attach') {
-    state.filterAttach = !state.filterAttach; // 토글
-    $$('.filter-chip[data-filter="attach"]').forEach(c => c.classList.toggle('active', state.filterAttach));
-    render();
+  var items = document.querySelectorAll('.rv');
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(function(el){ el.classList.add('in'); });
     return;
   }
-  $$('.filter-chip[data-filter="'+type+'"]').forEach(c => {
-    c.classList.toggle('active', c.dataset.value === value);
-  });
-  render();
-}
-
-function setView(view) {
-  state.view = view;
-  $('#viewListBtn').classList.toggle('active', view === 'list');
-  $('#viewGroupBtn').classList.toggle('active', view === 'group');
-  render();
-}
-
-// 현재 작품 범위 내 카테고리 필터 칩 렌더링
-function renderCategoryFilters() {
-  const scoped = state.currentWorkId === null
-    ? state.issues
-    : state.issues.filter(i => i.work_id === state.currentWorkId);
-  const cats = [...new Set(scoped.map(i => i.category).filter(Boolean))].sort();
-  const container = $('#categoryFilters');
-  if (cats.length === 0) { container.innerHTML = ''; return; }
-
-  // 현재 선택된 카테고리가 범위 밖이면 리셋
-  if (state.filterCategory !== 'all' && !cats.includes(state.filterCategory)) {
-    state.filterCategory = 'all';
-  }
-
-  let html = `<span class="filter-chip ${state.filterCategory==='all'?'active':''}" data-filter="category" data-value="all">전체 카테고리</span>`;
-  cats.forEach(cat => {
-    const cnt = scoped.filter(i => i.category === cat).length;
-    html += `<span class="filter-chip ${state.filterCategory===cat?'active':''}" data-filter="category" data-value="${escapeHtml(cat)}">${escapeHtml(cat)} <span style="opacity:0.6; font-family:'JetBrains Mono',monospace; font-size:11px;">${cnt}</span></span>`;
-  });
-  container.innerHTML = html;
-
-  container.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => setFilter('category', chip.dataset.value));
-  });
-}
-
-function getFilteredIssues() {
-  return state.issues.filter(i => {
-    if (state.currentWorkId !== null && i.work_id !== state.currentWorkId) return false;
-    if (state.filterStatus !== 'all' && i.status !== state.filterStatus) return false;
-    if (state.filterPriority !== 'all' && i.priority !== state.filterPriority) return false;
-    if (state.filterCategory !== 'all' && i.category !== state.filterCategory) return false;
-    if (state.filterAttach && !i._attachCount) return false;
-    return true;
-  });
-}
-
-function issueCardHtml(i) {
-  const work = state.works.find(w => w.id === i.work_id);
-  return `<div class="issue-card priority-${i.priority} ${i._attachCount ? 'has-attachment' : ''}" onclick="openDetail(${i.id})">
-    <div class="issue-head">
-      <div class="issue-title-block">
-        <div class="issue-title">${escapeHtml(i.title)}</div>
-        <div class="issue-meta">
-          <span class="id mono">#${String(i.id).padStart(3,'0')}</span>
-          <span>${work ? escapeHtml(work.name) : '-'}</span>
-          ${i.reporter ? `<span>• 제보 ${escapeHtml(i.reporter)}</span>` : ''}
-          ${i.assignee ? `<span>• 담당 ${escapeHtml(i.assignee)}</span>` : ''}
-          <span>• ${formatTime(i.updated_at)}</span>
-        </div>
-      </div>
-      <div class="issue-right">
-        <div class="issue-tags">
-          <span class="tag tag-${i.priority}">${PRIORITY_LABELS[i.priority]}</span>
-          <span class="tag tag-${i.status}">${STATUS_LABELS[i.status]}</span>
-          ${i.category ? `<span class="tag tag-category">${escapeHtml(i.category)}</span>` : ''}
-          ${i._attachCount ? `<span class="tag tag-attach">📎 ${i._attachCount}</span>` : ''}
-        </div>
-        ${i._thumb ? `<div class="card-thumb" onclick="event.stopPropagation(); openLightbox('${escapeHtml(i._thumb)}')"><img src="${escapeHtml(i._thumb)}" alt="" loading="lazy">${i._attachCount > 1 ? `<span class="card-thumb-more">+${i._attachCount - 1}</span>` : ''}</div>` : ''}
-      </div>
-    </div>
-    ${i.description ? `<div class="issue-desc">${escapeHtml(i.description)}</div>` : ''}
-  </div>`;
-}
-
-function render() {
-  renderCategoryFilters();
-  const issues = getFilteredIssues();
-  const work = state.works.find(w => w.id === state.currentWorkId);
-  $('#currentWorkTitle').textContent = work ? work.name : '전체 이슈';
-  $('#currentMeta').textContent = `${issues.length} issues`;
-
-  // Stats
-  const all = state.currentWorkId === null ? state.issues : state.issues.filter(i => i.work_id === state.currentWorkId);
-  const counts = {
-    total: all.length,
-    critical: all.filter(i => i.priority === 'critical' && !['resolved','closed'].includes(i.status)).length,
-    open: all.filter(i => i.status === 'open').length,
-    progress: all.filter(i => i.status === 'in_progress' || i.status === 'testing').length,
-    resolved: all.filter(i => i.status === 'resolved' || i.status === 'closed').length
-  };
-  $('#statsBar').innerHTML = `
-    <div class="stat-card"><div class="stat-label">전체</div><div class="stat-value">${counts.total}</div></div>
-    <div class="stat-card"><div class="stat-label" style="color:var(--critical)">Critical</div><div class="stat-value" style="color:var(--critical)">${counts.critical}</div></div>
-    <div class="stat-card"><div class="stat-label">Open</div><div class="stat-value">${counts.open}</div></div>
-    <div class="stat-card"><div class="stat-label">진행/테스트</div><div class="stat-value">${counts.progress}</div></div>
-    <div class="stat-card"><div class="stat-label" style="color:var(--success)">완료</div><div class="stat-value" style="color:var(--success)">${counts.resolved}</div></div>
-  `;
-
-  if (issues.length === 0) {
-    $('#issueList').innerHTML = `<div class="empty"><div class="empty-icon">∅</div><div class="empty-text">해당 조건의 이슈가 없습니다</div></div>`;
-    return;
-  }
-
-  const order = { critical: 0, high: 1, medium: 2, low: 3 };
-  const sortFn = (a,b) => (order[a.priority]||9) - (order[b.priority]||9) || new Date(b.created_at) - new Date(a.created_at);
-
-  if (state.view === 'group') {
-    renderGroupView(issues, sortFn);
-  } else {
-    const sorted = [...issues].sort(sortFn);
-    $('#issueList').innerHTML = sorted.map(issueCardHtml).join('');
-  }
-}
-
-// 카테고리(태그)별로 묶어서 출력
-function renderGroupView(issues, sortFn) {
-  const groups = {};
-  issues.forEach(i => {
-    const key = i.category || '(미분류)';
-    (groups[key] = groups[key] || []).push(i);
-  });
-  const order = { critical: 0, high: 1, medium: 2, low: 3 };
-  // 그룹 정렬: 그룹 내 최고 우선순위 → 이슈 수 순
-  const groupKeys = Object.keys(groups).sort((a,b) => {
-    const minA = Math.min(...groups[a].map(i => order[i.priority] ?? 9));
-    const minB = Math.min(...groups[b].map(i => order[i.priority] ?? 9));
-    return minA - minB || groups[b].length - groups[a].length;
-  });
-
-  $('#issueList').innerHTML = groupKeys.map(key => {
-    const items = groups[key].sort(sortFn);
-    const openCnt = items.filter(i => !['resolved','closed'].includes(i.status)).length;
-    const critCnt = items.filter(i => i.priority === 'critical' && !['resolved','closed'].includes(i.status)).length;
-    const doneCnt = items.filter(i => ['resolved','closed'].includes(i.status)).length;
-    let bar = '';
-    if (critCnt) bar += `<span class="mini-stat tag-critical">CRIT ${critCnt}</span>`;
-    if (openCnt) bar += `<span class="mini-stat tag-open">미해결 ${openCnt}</span>`;
-    if (doneCnt) bar += `<span class="mini-stat tag-resolved">완료 ${doneCnt}</span>`;
-    return `<div class="category-group">
-      <div class="category-group-header">
-        <span class="category-group-name">${escapeHtml(key)}</span>
-        <span class="category-group-count mono">${items.length}건</span>
-        <span class="category-group-bar">${bar}</span>
-      </div>
-      <div class="issue-list">${items.map(issueCardHtml).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-function escapeHtml(s) {
-  if (s === null || s === undefined) return '';
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-// Modals
-function openIssueModal(issue = null) {
-  state.editingIssueId = issue ? issue.id : null;
-  $('#issueModalTitle').textContent = issue ? '이슈 편집' : '새 이슈 등록';
-  $('#issueTitle').value = issue?.title || '';
-  $('#issueDesc').value = issue?.description || '';
-  $('#issueWork').value = issue?.work_id || (state.currentWorkId || (state.works[0]?.id || ''));
-  $('#issueCategory').value = issue?.category || '프롬프트';
-  $('#issuePriority').value = issue?.priority || 'medium';
-  $('#issueStatus').value = issue?.status || 'open';
-  $('#issueReporter').value = issue?.reporter || '';
-  $('#issueAssignee').value = issue?.assignee || '';
-  state.stagedFiles = [];
-  $('#stagedThumbs').innerHTML = '';
-  $('#issueFileInput').value = '';
-  $('#issueModal').classList.add('active');
-  setTimeout(()=>$('#issueTitle').focus(), 50);
-}
-
-function openWorkModal() {
-  $('#workName').value = '';
-  $('#workDesc').value = '';
-  $('#workModal').classList.add('active');
-  setTimeout(()=>$('#workName').focus(), 50);
-}
-
-function closeModal(id) {
-  $('#'+id).classList.remove('active');
-}
-
-async function saveWork() {
-  const name = $('#workName').value.trim();
-  const desc = $('#workDesc').value.trim();
-  if (!name) return showToast('작품명을 입력하세요', 'error');
-  const { error } = await sb.from('qa_works').insert({ name, description: desc });
-  if (error) return showToast('저장 실패: '+error.message, 'error');
-  closeModal('workModal');
-  showToast('작품이 추가되었습니다');
-  await loadWorks();
-  await loadIssues();
-}
-
-async function saveIssue() {
-  const btn = $('#saveIssueBtn');
-  btn.disabled = true;
-  const payload = {
-    title: $('#issueTitle').value.trim(),
-    description: $('#issueDesc').value.trim() || null,
-    work_id: parseInt($('#issueWork').value) || null,
-    category: $('#issueCategory').value,
-    priority: $('#issuePriority').value,
-    status: $('#issueStatus').value,
-    reporter: $('#issueReporter').value.trim() || null,
-    assignee: $('#issueAssignee').value.trim() || null
-  };
-  if (!payload.title) { btn.disabled=false; return showToast('제목을 입력하세요', 'error'); }
-  if (!payload.work_id) { btn.disabled=false; return showToast('작품을 선택하세요', 'error'); }
-
-  let error, savedId = state.editingIssueId;
-  if (state.editingIssueId) {
-    ({ error } = await sb.from('qa_issues').update(payload).eq('id', state.editingIssueId));
-  } else {
-    const { data, error: insErr } = await sb.from('qa_issues').insert(payload).select('id').single();
-    error = insErr;
-    if (data) savedId = data.id;
-  }
-  if (error) { btn.disabled = false; return showToast('저장 실패: '+error.message, 'error'); }
-
-  // 스테이징된 이미지 업로드
-  if (state.stagedFiles.length && savedId) {
-    btn.textContent = '이미지 업로드 중...';
-    for (const f of state.stagedFiles) {
-      await uploadAttachment(savedId, f, payload.reporter);
-    }
-  }
-
-  btn.disabled = false;
-  btn.textContent = '저장';
-  state.stagedFiles = [];
-  closeModal('issueModal');
-  showToast(state.editingIssueId ? '이슈가 수정되었습니다' : '이슈가 등록되었습니다');
-  await loadIssues();
-}
-
-// ========== 이미지 첨부 ==========
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = ['image/png','image/jpeg','image/jpg','image/gif','image/webp'];
-
-function validateImage(file) {
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    showToast('이미지 파일만 첨부 가능합니다 (PNG/JPG/GIF/WEBP)', 'error');
-    return false;
-  }
-  if (file.size > MAX_FILE_SIZE) {
-    showToast('파일 크기는 10MB 이하여야 합니다', 'error');
-    return false;
-  }
-  return true;
-}
-
-// 등록 모달: 저장 전 파일 스테이징
-function handleStagedFiles(event) {
-  const files = Array.from(event.target.files || []);
-  addStagedFiles(files);
-  event.target.value = '';
-}
-
-function addStagedFiles(files) {
-  files.forEach(file => {
-    if (!validateImage(file)) return;
-    const preview = URL.createObjectURL(file);
-    state.stagedFiles.push({ file, preview });
-  });
-  renderStagedThumbs();
-}
-
-function renderStagedThumbs() {
-  const grid = $('#stagedThumbs');
-  grid.innerHTML = state.stagedFiles.map((s, idx) => `
-    <div class="thumb" onclick="openLightbox('${s.preview}')">
-      <img src="${s.preview}" alt="">
-      <button class="thumb-remove" onclick="event.stopPropagation(); removeStagedFile(${idx})">✕</button>
-    </div>
-  `).join('');
-}
-
-function removeStagedFile(idx) {
-  URL.revokeObjectURL(state.stagedFiles[idx].preview);
-  state.stagedFiles.splice(idx, 1);
-  renderStagedThumbs();
-}
-
-// 실제 Supabase Storage 업로드
-async function uploadAttachment(issueId, staged, uploadedBy) {
-  const file = staged.file;
-  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
-  const path = `issue-${issueId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
-  const { error: upErr } = await sb.storage.from('qa-images').upload(path, file, {
-    contentType: file.type, upsert: false
-  });
-  if (upErr) { showToast('이미지 업로드 실패: '+upErr.message, 'error'); return; }
-  const { data: pub } = sb.storage.from('qa-images').getPublicUrl(path);
-  const { error: dbErr } = await sb.from('qa_attachments').insert({
-    issue_id: issueId,
-    file_path: path,
-    public_url: pub.publicUrl,
-    file_name: file.name,
-    uploaded_by: uploadedBy || null
-  });
-  if (dbErr) { showToast('첨부 정보 저장 실패: '+dbErr.message, 'error'); }
-}
-
-// 상세 모달: 즉시 업로드
-async function handleDetailUpload(event) {
-  const files = Array.from(event.target.files || []);
-  event.target.value = '';
-  if (!files.length) return;
-  const author = localStorage.getItem('qa_user_name') || null;
-  showToast(`이미지 ${files.length}개 업로드 중...`);
-  for (const file of files) {
-    if (!validateImage(file)) continue;
-    await uploadAttachment(state.currentIssueId, { file }, author);
-  }
-  showToast('이미지가 첨부되었습니다');
-  loadAttachments(state.currentIssueId);
-}
-
-async function loadAttachments(issueId) {
-  const { data, error } = await sb.from('qa_attachments').select('*').eq('issue_id', issueId).order('created_at');
-  const grid = $('#attachmentGrid');
-  if (!grid) return;
-  const countEl = $('#attachmentCount');
-  if (error) { grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">첨부 로드 실패</div>'; return; }
-  if (countEl) countEl.textContent = (data || []).length;
-  if (!data || data.length === 0) {
-    grid.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:4px 0;">첨부된 이미지가 없습니다</div>';
-    return;
-  }
-  grid.innerHTML = data.map(a => `
-    <div class="thumb" onclick="openLightbox('${a.public_url}')">
-      <img src="${escapeHtml(a.public_url)}" alt="${escapeHtml(a.file_name||'')}" loading="lazy">
-      <button class="thumb-remove" onclick="event.stopPropagation(); deleteAttachment(${a.id}, '${escapeHtml(a.file_path)}')">✕</button>
-    </div>
-  `).join('');
-}
-
-async function deleteAttachment(attId, filePath) {
-  if (!confirm('이 이미지를 삭제하시겠습니까?')) return;
-  await sb.storage.from('qa-images').remove([filePath]);
-  const { error } = await sb.from('qa_attachments').delete().eq('id', attId);
-  if (error) return showToast('삭제 실패: '+error.message, 'error');
-  showToast('이미지가 삭제되었습니다');
-  loadAttachments(state.currentIssueId);
-}
-
-// Lightbox
-function openLightbox(url) {
-  $('#lightboxImg').src = url;
-  $('#lightbox').classList.add('active');
-}
-function closeLightbox() {
-  $('#lightbox').classList.remove('active');
-  $('#lightboxImg').src = '';
-}
-
-async function openDetail(id) {
-  state.currentIssueId = id;
-  const issue = state.issues.find(i => i.id === id);
-  if (!issue) return;
-  const work = state.works.find(w => w.id === issue.work_id);
-
-  $('#detailTitle').textContent = `#${String(issue.id).padStart(3,'0')} ${issue.title}`;
-
-  $('#detailBody').innerHTML = `
-    <div class="detail-meta">
-      <div class="detail-meta-item"><div class="label">작품</div><div class="value">${work ? escapeHtml(work.name) : '-'}</div></div>
-      <div class="detail-meta-item"><div class="label">우선순위</div><div class="value"><span class="tag tag-${issue.priority}">${PRIORITY_LABELS[issue.priority]}</span></div></div>
-      <div class="detail-meta-item"><div class="label">상태</div><div class="value"><span class="tag tag-${issue.status}">${STATUS_LABELS[issue.status]}</span></div></div>
-      <div class="detail-meta-item"><div class="label">카테고리</div><div class="value">${issue.category ? escapeHtml(issue.category) : '-'}</div></div>
-      <div class="detail-meta-item"><div class="label">제보자</div><div class="value">${issue.reporter ? escapeHtml(issue.reporter) : '-'}</div></div>
-      <div class="detail-meta-item"><div class="label">담당자</div><div class="value">${issue.assignee ? escapeHtml(issue.assignee) : '-'}</div></div>
-      <div class="detail-meta-item"><div class="label">등록일</div><div class="value mono" style="font-size:12px">${new Date(issue.created_at).toLocaleString('ko-KR')}</div></div>
-      <div class="detail-meta-item"><div class="label">최종수정</div><div class="value mono" style="font-size:12px">${new Date(issue.updated_at).toLocaleString('ko-KR')}</div></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">상세 설명</div>
-      <div class="detail-desc">${issue.description ? escapeHtml(issue.description) : '(설명 없음)'}</div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">첨부 이미지 <span class="count" id="attachmentCount">·</span></div>
-      <div class="thumb-grid" id="attachmentGrid"><div style="color:var(--text-muted);font-size:13px;">로딩...</div></div>
-      <div style="margin-top:10px;">
-        <input type="file" id="detailFileInput" accept="image/*" multiple style="display:none" onchange="handleDetailUpload(event)">
-        <button class="btn btn-sm" onclick="document.getElementById('detailFileInput').click()">＋ 이미지 추가</button>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">상태 변경</div>
-      <div style="display:flex; gap:6px; flex-wrap:wrap;">
-        ${Object.entries(STATUS_LABELS).map(([k,v]) =>
-          `<button class="btn btn-sm ${issue.status===k?'btn-primary':''}" onclick="updateStatus(${issue.id}, '${k}')">${v}</button>`
-        ).join('')}
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">코멘트 <span class="count" id="commentCount">·</span></div>
-      <div class="comment-list" id="commentList"><div class="loading" style="padding:20px;">로딩...</div></div>
-      <div class="comment-form">
-        <input type="text" class="form-input author-input" id="commentAuthor" placeholder="이름" value="${localStorage.getItem('qa_user_name') || ''}">
-        <input type="text" class="form-input" id="commentContent" placeholder="코멘트 작성 후 Enter" onkeydown="if(event.key==='Enter')addComment()">
-        <button class="btn btn-primary btn-sm" onclick="addComment()">등록</button>
-      </div>
-    </div>
-  `;
-
-  $('#detailModal').classList.add('active');
-  loadComments(id);
-  loadAttachments(id);
-}
-
-async function loadComments(issueId) {
-  const { data, error } = await sb.from('qa_comments').select('*').eq('issue_id', issueId).order('created_at');
-  const list = $('#commentList');
-  if (error) { list.innerHTML = '<div class="empty">코멘트 로드 실패</div>'; return; }
-  $('#commentCount').textContent = (data || []).length;
-  if (!data || data.length === 0) {
-    list.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:8px 0;">아직 코멘트가 없습니다</div>';
-    return;
-  }
-  list.innerHTML = data.map(c => `
-    <div class="comment">
-      <div class="comment-head">
-        <div class="comment-author">${escapeHtml(c.author)}</div>
-        <div class="comment-time">${formatTime(c.created_at)}</div>
-      </div>
-      <div class="comment-content">${escapeHtml(c.content)}</div>
-    </div>
-  `).join('');
-}
-
-async function addComment() {
-  const author = $('#commentAuthor').value.trim();
-  const content = $('#commentContent').value.trim();
-  if (!author) return showToast('이름을 입력하세요', 'error');
-  if (!content) return showToast('내용을 입력하세요', 'error');
-  localStorage.setItem('qa_user_name', author);
-  const { error } = await sb.from('qa_comments').insert({
-    issue_id: state.currentIssueId, author, content
-  });
-  if (error) return showToast('코멘트 등록 실패: '+error.message, 'error');
-  $('#commentContent').value = '';
-  loadComments(state.currentIssueId);
-}
-
-async function updateStatus(issueId, status) {
-  const patch = { status };
-  if (status === 'resolved' || status === 'closed') patch.resolved_at = new Date().toISOString();
-  else patch.resolved_at = null;
-  const { error } = await sb.from('qa_issues').update(patch).eq('id', issueId);
-  if (error) return showToast('상태 변경 실패: '+error.message, 'error');
-  showToast(`상태가 "${STATUS_LABELS[status]}"(으)로 변경되었습니다`);
-  await loadIssues();
-  openDetail(issueId);
-}
-
-function editCurrentIssue() {
-  const issue = state.issues.find(i => i.id === state.currentIssueId);
-  if (!issue) return;
-  closeModal('detailModal');
-  openIssueModal(issue);
-}
-
-async function deleteCurrentIssue() {
-  if (!confirm('이 이슈를 삭제하시겠습니까? 코멘트도 함께 삭제됩니다.')) return;
-  const { error } = await sb.from('qa_issues').delete().eq('id', state.currentIssueId);
-  if (error) return showToast('삭제 실패: '+error.message, 'error');
-  closeModal('detailModal');
-  showToast('이슈가 삭제되었습니다');
-  await loadIssues();
-}
-
-function copyShareLink() {
-  const url = window.location.href;
-  navigator.clipboard.writeText(url).then(() => {
-    showToast('공유 링크가 복사되었습니다');
-  }).catch(() => {
-    showToast('복사 실패. 주소창에서 직접 복사해주세요.', 'error');
-  });
-}
-
-function exportData() {
-  const issues = getFilteredIssues();
-  const work = state.works.find(w => w.id === state.currentWorkId);
-  const lines = [];
-  lines.push(`# Chatple QA 리포트 - ${work ? work.name : '전체'}`);
-  lines.push(`생성일시: ${new Date().toLocaleString('ko-KR')}`);
-  lines.push(`이슈 수: ${issues.length}건`);
-  lines.push('');
-
-  const order = { critical: 0, high: 1, medium: 2, low: 3 };
-  const sortFn = (a,b) => (order[a.priority]||9) - (order[b.priority]||9) || new Date(b.created_at) - new Date(a.created_at);
-
-  const writeIssue = (i) => {
-    const w = state.works.find(x => x.id === i.work_id);
-    lines.push(`### #${String(i.id).padStart(3,'0')} [${PRIORITY_LABELS[i.priority]}] ${i.title}`);
-    lines.push(`- 작품: ${w?.name || '-'}`);
-    lines.push(`- 상태: ${STATUS_LABELS[i.status]}`);
-    lines.push(`- 카테고리: ${i.category || '-'}`);
-    lines.push(`- 제보: ${i.reporter || '-'} / 담당: ${i.assignee || '-'}`);
-    if (i.description) {
-      lines.push(`- 내용:`);
-      lines.push(i.description.split('\n').map(l => '  ' + l).join('\n'));
-    }
-    lines.push('');
-  };
-
-  if (state.view === 'group') {
-    // 카테고리(태그)별로 묶어서 출력
-    const groups = {};
-    issues.forEach(i => {
-      const key = i.category || '(미분류)';
-      (groups[key] = groups[key] || []).push(i);
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     });
-    Object.keys(groups).sort().forEach(key => {
-      const items = groups[key].sort(sortFn);
-      lines.push(`## 📌 ${key} (${items.length}건)`);
-      lines.push('');
-      items.forEach(writeIssue);
-    });
-  } else {
-    issues.sort(sortFn).forEach(writeIssue);
-  }
-
-  const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `qa-report-${(work?.name || 'all').replace(/\s/g,'_')}-${new Date().toISOString().slice(0,10)}.md`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('마크다운 리포트가 다운로드되었습니다');
-}
-
-// Filter chip listeners
-$$('.filter-chip').forEach(chip => {
-  chip.addEventListener('click', () => setFilter(chip.dataset.filter, chip.dataset.value));
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  items.forEach(function(el){ io.observe(el); });
 });
-
-// Click outside modal to close
-$$('.modal-backdrop').forEach(m => {
-  m.addEventListener('click', e => {
-    if (e.target === m) m.classList.remove('active');
-  });
-});
-
-// Realtime subscription
-function subscribeRealtime() {
-  sb.channel('qa-realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_issues' }, () => loadIssues())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_works' }, () => loadWorks())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_comments' }, payload => {
-      if (state.currentIssueId && $('#detailModal').classList.contains('active')) {
-        loadComments(state.currentIssueId);
-      }
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'qa_attachments' }, payload => {
-      if (state.currentIssueId && $('#detailModal').classList.contains('active')) {
-        loadAttachments(state.currentIssueId);
-      }
-    })
-    .subscribe();
-}
-
-// 등록 모달 드래그앤드롭
-const uploadZone = $('#issueUploadZone');
-if (uploadZone) {
-  ['dragenter','dragover'].forEach(ev => uploadZone.addEventListener(ev, e => {
-    e.preventDefault(); uploadZone.classList.add('dragover');
-  }));
-  ['dragleave','drop'].forEach(ev => uploadZone.addEventListener(ev, e => {
-    e.preventDefault(); uploadZone.classList.remove('dragover');
-  }));
-  uploadZone.addEventListener('drop', e => {
-    const files = Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/'));
-    if (files.length) addStagedFiles(files);
-  });
-}
-
-// 등록 모달 열려있을 때 붙여넣기(Ctrl+V)
-document.addEventListener('paste', e => {
-  if (!$('#issueModal').classList.contains('active')) return;
-  const items = Array.from(e.clipboardData?.items || []);
-  const files = items.filter(it => it.type.startsWith('image/')).map(it => it.getAsFile()).filter(Boolean);
-  if (files.length) { addStagedFiles(files); showToast('붙여넣은 이미지가 첨부되었습니다'); }
-});
-
-// ESC로 라이트박스/모달 닫기
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Escape') return;
-  if ($('#lightbox').classList.contains('active')) { closeLightbox(); return; }
-  $$('.modal-backdrop.active').forEach(m => m.classList.remove('active'));
-});
-
-// Init
-(async () => {
-  await loadWorks();
-  await loadIssues();
-  subscribeRealtime();
-})();
 </script>
 </body>
 </html>
